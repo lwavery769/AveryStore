@@ -1,4 +1,5 @@
 #pragma once
+namespace ALStore{
 class Framebuffer
 {
 public:
@@ -8,3 +9,4 @@ public:
 private:
 };
 
+}

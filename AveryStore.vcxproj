@@ -108,6 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>AL_PLATFORM_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\imgui\ImGuiLayer.cpp" />
     <ClCompile Include="src\mypch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
@@ -147,16 +149,53 @@
     </ClCompile>
     <ClCompile Include="include\glad\src\glad.c" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\render\OrthographicCamera.cpp" />
+    <ClCompile Include="src\render\Buffer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\render\Framebuffer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\render\OrthographicCamera.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\render\Render2D.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\render\Shader.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\render\Texture2D.cpp" />
+    <ClCompile Include="src\render\TextureLibrary.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\render\VertexArray.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="src\window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\imgui\ImGuiLayer.h" />
     <ClInclude Include="src\core\core.h" />
     <ClInclude Include="src\core\KeyCodes.h" />
     <ClInclude Include="src\mypch.h" />
     <ClInclude Include="src\core\Log.h" />
     <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\render\Buffer.h" />
+    <ClInclude Include="src\render\Framebuffer.h" />
+    <ClInclude Include="src\render\Maths.h" />
     <ClInclude Include="src\render\OrthographicCamera.h" />
+    <ClInclude Include="src\render\Render2D.h" />
+    <ClInclude Include="src\render\Shader.h" />
+    <ClInclude Include="src\render\Texture2D.h" />
+    <ClInclude Include="src\render\TextureLibrary.h" />
+    <ClInclude Include="src\render\VertexArray.h" />
     <ClInclude Include="src\window\Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

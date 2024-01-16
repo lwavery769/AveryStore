@@ -1,8 +1,8 @@
 #include "mypch.h"
 #include "Texture2D.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-namespace Odyssey {
+#include "stb_image/stb_image.h"
+namespace ALStore {
 	Texture2D::Texture2D(uint32_t width, uint32_t height)
 		: m_Width(width), m_Height(height)
 	{
@@ -39,7 +39,7 @@ namespace Odyssey {
 		}
 		//unsigned char* img = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		if (!data) {
-			HZ_CORE_ERROR("Error loading image file"); return;
+			AL_CORE_ERROR("Error loading image file"); return;
 		}
 		else {
 			m_IsLoaded = true;
@@ -84,7 +84,7 @@ namespace Odyssey {
 		}
 
 		stbi_image_free(data);
-		HZ_CORE_INFO("loaded texture, renderID = {0}, {1}", m_RendererID, m_Name);
+		AL_CORE_INFO("loaded texture, renderID = {0}, {1}", m_RendererID, m_Name);
 		// return 0;
 	}
 	Texture2D::~Texture2D() { glDeleteTextures(1, &m_RendererID); }
@@ -101,12 +101,12 @@ namespace Odyssey {
 			data = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
 		}
 		//unsigned char* img = stbi_load(path.c_str(), &width, &height, &channels, 0);
-		if (!data) { HZ_CORE_ERROR("Error loading image file"); return; }
+		if (!data) { AL_CORE_ERROR("Error loading image file"); return; }
 		else {
 			m_IsLoaded = true;
 			m_Width = width;
 			m_Height = height;
-			HZ_CORE_INFO("loaded texture");
+			AL_CORE_INFO("loaded texture");
 			GLenum internalFormat = 0, dataFormat = 0;
 			if (channels == 4)
 			{

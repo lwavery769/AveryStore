@@ -1,7 +1,7 @@
 #pragma once
 #include <fstream>
 #include <glad/glad.h>
-namespace Odyssey{
+namespace ALStore{
 class Texture2D
 {
 public:

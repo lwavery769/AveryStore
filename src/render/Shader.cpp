@@ -2,7 +2,7 @@
 #include "Shader.h"
 #include <glad/glad.h>
 
-namespace Odyssey{
+namespace ALStore{
 static GLenum ShaderTypeFromString(const std::string& type)
 {
 	if (type == "vertex")
@@ -150,7 +150,7 @@ Shader::Shader(const std::string& filepath)
 		}
 		else
 		{
-			HZ_CORE_ERROR("Could not open file '{0}'", filepath);
+			AL_CORE_ERROR("Could not open file '{0}'", filepath);
 		}
 
 		return result;
@@ -204,7 +204,7 @@ Shader::Shader(const std::string& filepath)
 				logs = GetShaderInfoLog(shader);
 				glDeleteShader(shader);
 
-				HZ_CORE_ERROR("{0}", logs);
+				AL_CORE_ERROR("{0}", logs);
 				//AL_CORE_ASSERT(false, "Shader compilation failure!");
 				break;
 			}
@@ -236,7 +236,7 @@ Shader::Shader(const std::string& filepath)
 			for (auto id : glShaderIDs)
 				glDeleteShader(id);
 
-			HZ_CORE_ERROR("{0}", infoLog.data());
+			AL_CORE_ERROR("{0}", infoLog.data());
 			//AL_CORE_ASSERT(false, "Shader link failure!");
 			return;
 		}

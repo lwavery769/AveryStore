@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entities>
+	<entity ID="13466807492172565453">
+		<TagComponent>truck1</TagComponent>
+		<TransformComponent>
+			<Translation>{ 0.5f, 0.5f, 0.0f }</Translation>
+			<Rotation>0.0f</Rotation>
+			<Scale>{1.0f, 1.0f}</Scale>
+		</TransformComponent>
+		<SpriteRendererComponent>
+			<Color>{ 1.0f, 1.0f, 1.0f, 1.0f }</Color>
+			<Size>{ 0.75f, -0.75f }</Size>
+			<Texture>Truck1.png</Texture>
+			<Name>Truck1</Name>
+		</SpriteRendererComponent>
+	</entity>
+	<entity ID="13466807492172565454">
+		<TagComponent>truck2</TagComponent>
+		<TransformComponent>
+			<Translation>{ 0.5f, -0.5f, 0.0f }</Translation>
+			<Rotation>0.0f</Rotation>
+			<Scale>{1.0f, 1.0f}</Scale>
+		</TransformComponent>
+		<SpriteRendererComponent>
+			<Color>{ 1.0f, 1.0f, 1.0f, 1.0f }</Color>
+			<Size>{ 0.75f, -0.75f }</Size>
+			<Texture>Truck2.png</Texture>
+			<Name>Truck2</Name>
+		</SpriteRendererComponent>
+	</entity>
+</entities>

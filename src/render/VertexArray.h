@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "Buffer.h"
-namespace Odyssey {
+namespace ALStore {
 	class VertexArray
 	{
 	public:

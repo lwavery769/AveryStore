@@ -10,31 +10,20 @@ static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
-
 bool Engine::init() {
     m_Window = std::make_unique<ALStore::Window>();
+    m_TextureLibrary = std::make_unique<ALStore::TextureLibrary>();
+    m_Renderer = std::make_unique<ALStore::Render2D>();
+    m_ImGui = std::make_unique<ALStore::ImGuiLayer>();
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
     AL_INFO("Window init");
-    m_Window->init();
+    m_Window->init(1400, 800);
     m_Window->setRunning(true);
-       // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
-    
-    Engine& app = Engine::Get();
-    s_Window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
-    ww = app.GetWindow().GetWidth(); wh = app.GetWindow().GetHeight();
-    // Setup Platform/Renderer bindings
-    ImGui_ImplGlfw_InitForOpenGL(s_Window, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
-
+    m_TextureLibrary->init();
+    m_TextureLibrary->Load("assets/textures/Truck2.png");
+    m_texture = m_TextureLibrary->Get("Truck2.png");
+    m_Renderer->Init();
+    if (!m_ImGui->init()) AL_CORE_ERROR("ImGui failure!");
  
 	return true;
 }
@@ -53,17 +42,12 @@ void Engine::OnEvent(Event& e)
     //AL_CORE_TRACE("{0}", e);
 }
 void Engine::run() { 
+    m_Camera.SetProjection(-2, 2, -2, 2);
     while (m_Window->isRunning())
     {
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
+        m_Renderer->BeginScene(m_Camera);
+        m_ImGui->begin();
+   
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
             static float f = 0.0f;
@@ -86,7 +70,6 @@ void Engine::run() {
             //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
         }
-
         // 3. Show another simple window.
         if (show_another_window)
         {
@@ -100,14 +83,16 @@ void Engine::run() {
         // Rendering
 
         int display_w, display_h;
-        glfwGetFramebufferSize(s_Window, &display_w, &display_h);
+        
+        glfwGetFramebufferSize(m_Window->GetNativeWindow(), &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        m_texture->Bind();
+        glm::mat4 transform2 = ALStore::Maths::getTransform(m_size, m_position);
+        m_Renderer->DrawTexture(transform2, m_texture, { 1.0f, 1.0f, 1.0f, 1.0f });
+        m_Renderer->EndScene();
+        m_ImGui->render();
         m_Window->OnUpdate();
     }
 }
@@ -120,7 +105,7 @@ bool Engine::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e) {
 }
 bool Engine::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e) { return false; }
 bool Engine::OnMouseMovedEvent(MouseMovedEvent& e) {
-    m_mousePos.x = e.GetX(); m_mousePos.y = e.GetY();//HZ_CORE_INFO("{0}, {1}", m_mousePos.x, m_mousePos.y);
+    m_mousePos.x = e.GetX(); m_mousePos.y = e.GetY();//AL_CORE_INFO("{0}, {1}", m_mousePos.x, m_mousePos.y);
     return false;
 }
 bool Engine::OnMouseScrolledEvent(MouseScrolledEvent& e) {
@@ -133,7 +118,7 @@ bool Engine::OnMouseScrolledEvent(MouseScrolledEvent& e) {
     return true;
 }
 bool Engine::OnKeyPressedEvent(KeyPressedEvent& e) {
-    AL_CORE_TRACE("Engine: key pressed");
+    //AL_CORE_TRACE("Engine: key pressed");
     KeyPressedEvent& eventK = (KeyPressedEvent&)e;
     int ts = 1;
     glm::vec3 pos = m_Camera.GetPosition();
@@ -175,6 +160,8 @@ bool Engine::OnWindowResizeEvent(WindowResizeEvent& e) {
 }
 bool Engine::OnWindowClose(WindowCloseEvent& e)
 {
+    AL_TRACE("Goodbye");
+
     m_Window->setRunning(false);
     return true;
 }

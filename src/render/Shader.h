@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "glm/glm/glm.hpp"
 #include "glm/glm/ext.hpp"
-namespace Odyssey{
+namespace ALStore{
 class Shader
 	{
 	public:

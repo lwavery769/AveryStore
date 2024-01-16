@@ -17,11 +17,11 @@ namespace ALStore {
 		AL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	bool Window::init() {
+	bool Window::init(int w, int h) {
 		AL_CORE_INFO("Window init");
 		if (!glfwInit()) AL_CORE_CRITICAL("GLFW FAILED");
 		glfwSetErrorCallback(GLFWErrorCallback);
-		m_Window = glfwCreateWindow(800, 600, "ALAvery", NULL, NULL);
+		m_Window = glfwCreateWindow(w,h, "ALAvery", NULL, NULL);
 		if (!m_Window) { AL_CORE_CRITICAL("GLFW WINDOW CREATION FAILED"); return false; }
 		m_Data.Title = "ALAvery"; // props.Title;
 		m_Data.Width = 800; // props.Width;

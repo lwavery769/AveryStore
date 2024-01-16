@@ -22,7 +22,7 @@ namespace ALStore {
 			{
 			}
 		};
-		bool init();
+		bool init(int w, int h);
 		void OnUpdate();
 		void OnShutdown();
 		void setRunning(bool r) { m_running = r; }

@@ -1,6 +1,8 @@
+#include "mypch.h"
 #include "Buffer.h"
 #include <glad/glad.h>
-namespace Odyssey {
+
+namespace ALStore {
 	VertexBuffer::VertexBuffer(uint32_t size)
 	{
 		glCreateBuffers(1, &m_RendererID);

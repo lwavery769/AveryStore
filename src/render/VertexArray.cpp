@@ -1,8 +1,8 @@
-#include "../mypch.h"
+#include "mypch.h"
 #include "VertexArray.h"
 
 #include <glad/glad.h>
-namespace Odyssey {
+namespace ALStore {
 	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 	{
 		switch (type)

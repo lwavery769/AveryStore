@@ -2,7 +2,7 @@
 #include "Render2D.h"
 #include <glad/glad.h>
 
-namespace Odyssey {
+namespace ALStore {
 	//Render2D::SceneData* Render2D::s_SceneData = new Render2D::SceneData;
 	Render2D::Render2D() {}
 	Render2D::~Render2D() {}
@@ -53,11 +53,12 @@ namespace Odyssey {
 		s_Data.QuadVertexArray.reset(new VertexArray());
 		s_Data.QuadVertexBuffer.reset(new VertexBuffer(s_Data.MaxVertices * sizeof(QuadVertex)));
 		s_Data.QuadVertexBuffer->SetLayout({
-		{ ShaderDataType::Float3, "a_Position" },
-		{ ShaderDataType::Float2, "a_TexCoord" },
-		{ ShaderDataType::Float,  "a_TexIndex" }
-		
-			});//{ ShaderDataType::Float4, "a_Color"    },{ ShaderDataType::Int,    "a_EntityID" }
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float4, "a_Color"    },
+			{ ShaderDataType::Float2, "a_TexCoord" },
+			{ ShaderDataType::Float,  "a_TexIndex" },
+			{ ShaderDataType::Int,    "a_EntityID" }
+				});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
 		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
@@ -89,7 +90,7 @@ namespace Odyssey {
 		for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
 			samplers[i] = i;
 
-		s_Data.TextureShader.reset(new Shader("Resources/Shaders/TextureShader.glsl"));
+		s_Data.TextureShader.reset(new Shader("assets/shaders/TextureShader.glsl"));
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->UploadUniformIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
 
@@ -99,11 +100,27 @@ namespace Odyssey {
 		s_Data.QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
-		s_Data.flatColorShader.reset(new Shader("Resources/Shaders/flatColor.glsl"));
-		s_Data.TruckTexture.reset(new Texture2D("Resources/Textures/Truck2.png"));
+		s_Data.flatColorShader.reset(new Shader("assets/shaders/flatColor.glsl"));
+		s_Data.TruckTexture.reset(new Texture2D("assets/textures/Truck2.png"));
 		s_Data.TextureSlots[1] = s_Data.TruckTexture;
 		s_Data.TextureSlotIndex++;
 	}
+	void Render2D::BeginScene(OrthographicCamera& camera)
+	{
+		//HZ_PROFILE_FUNCTION();
+		//s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+		//s_Data.TextureSlotIndex = 1;
+	}
+
 	void Render2D::EndScene()
 	{
 		uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
