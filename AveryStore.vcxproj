@@ -134,6 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\scene\Scene.cpp" />
+    <ClCompile Include="src\core\UUID.cpp" />
     <ClCompile Include="src\imgui\ImGuiLayer.cpp" />
     <ClCompile Include="src\mypch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -181,6 +183,9 @@
     <ClCompile Include="src\window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\scene\Scene.h" />
+    <ClInclude Include="src\core\Timestep.h" />
+    <ClInclude Include="src\core\UUID.h" />
     <ClInclude Include="src\imgui\ImGuiLayer.h" />
     <ClInclude Include="src\core\core.h" />
     <ClInclude Include="src\core\KeyCodes.h" />
@@ -196,6 +201,7 @@
     <ClInclude Include="src\render\Texture2D.h" />
     <ClInclude Include="src\render\TextureLibrary.h" />
     <ClInclude Include="src\render\VertexArray.h" />
+    <ClInclude Include="src\scene\Componets.h" />
     <ClInclude Include="src\window\Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -142,6 +142,72 @@ namespace ALStore {
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+/*	void Render2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	{
+		//DrawQuad(transform, src.Color, entityID);
+		if (src.Texture) {
+			DrawTexture(transform, src, src.Color, entityID);
+			//src.Texture->unBind();
+		}
+		else
+			DrawSprite(transform, src.Color, entityID);//
+	}*/
+	void Render2D::DrawSprite(const glm::mat4& transform, const glm::vec4& color, int entityID) {
+		//HZ_PROFILE_FUNCTION();
+		constexpr size_t quadVertexCount = 4;
+		const float textureIndex = 0.0f;
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)	Flush();
+
+		for (size_t i = 0; i < quadVertexCount; i++) {
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
+			s_Data.QuadVertexBufferPtr++;
+		}
+		s_Data.QuadIndexCount += 6;	//s_Data.Stats.QuadCount++;
+	}
+	/*void Render2D::DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID)
+	{
+		//HZ_PROFILE_FUNCTION();
+		constexpr size_t quadVertexCount = 4;
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };;
+		bool flipped = 1;
+		if (!flipped) {
+			constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		}
+		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)  Flush();
+
+		float textureIndex = 0.0f;
+		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) {
+			if (*s_Data.TextureSlots[i].get() == *src.Texture.get()) {
+				textureIndex = (float)i; break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			if (s_Data.TextureSlotIndex >= s_Data.MaxTextureSlots) Flush();
+
+			textureIndex = (float)s_Data.TextureSlotIndex;
+			s_Data.TextureSlots[s_Data.TextureSlotIndex] = src.Texture;
+			s_Data.TextureSlotIndex++;
+		}
+
+		for (size_t i = 0; i < quadVertexCount; i++) {
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
+			s_Data.QuadVertexBufferPtr++;
+		}
+		s_Data.QuadIndexCount += 6;
+
+		//s_Data.Stats.QuadCount++;
+	}*/
 	void Render2D::DrawTexture(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec4& tintColor) 
 	{
 		//HZ_PROFILE_FUNCTION();
@@ -195,5 +261,60 @@ namespace ALStore {
 			s_Data.QuadVertexBufferPtr++;
 		}
 		s_Data.QuadIndexCount += 6;
+	}
+	void Render2D::DrawTile(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec2& tileCoords, const glm::vec4& tintColor) {
+		//HZ_PROFILE_FUNCTION();
+		constexpr size_t quadVertexCount = 4;
+		float x = tileCoords.x; float y = tileCoords.y;
+		constexpr float sheetW = 2560; constexpr float sheetH = 1664;
+		float spriteW = 128; float spriteH = 128;
+		glm::vec2* txtrCrds = new glm::vec2[4];
+		txtrCrds[0] = { (x * spriteW) / sheetW, (y * spriteH) / sheetH };
+		txtrCrds[1] = { ((x + 1) * spriteW) / sheetW, (y * spriteH) / sheetH };
+		txtrCrds[2] = { ((x + 1) * spriteW) / sheetW, ((y + 1) * spriteH) / sheetH };
+		txtrCrds[3] = { (x * spriteW) / sheetW, ((y + 1) * spriteH) / sheetH };
+		//const float tilingFactor = 1.0f;
+		if (s_Data.QuadIndexCount >= s_Data.MaxIndices) Flush();
+		float textureIndex = 0.0f;
+		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+		{
+			if (*s_Data.TextureSlots[i] == *texture)
+			{
+				textureIndex = (float)i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			if (s_Data.TextureSlotIndex >= Renderer2DStorage::MaxTextureSlots)
+				Flush();
+			
+			textureIndex = (float)s_Data.TextureSlotIndex;
+			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+			s_Data.TextureSlotIndex++;
+		}
+
+		/*for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+		{
+			if (*s_Data.TextureSlots[i].get() == *texture.get()){texIndex = (float)i; break;}
+			if (texIndex == 0.0f){
+				texIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+				s_Data.TextureSlotIndex++;
+			}
+		}*/
+
+
+		for (size_t i = 0; i < quadVertexCount; i++)
+		{
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = txtrCrds[i];
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr++;
+		}
+		s_Data.QuadIndexCount += 6;
+		delete[] txtrCrds;
 	}
 }

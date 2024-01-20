@@ -14,6 +14,7 @@ bool Engine::init() {
     m_Window = std::make_unique<ALStore::Window>();
     m_TextureLibrary = std::make_unique<ALStore::TextureLibrary>();
     m_Renderer = std::make_unique<ALStore::Render2D>();
+    //m_ActiveScene = std::make_shared<ALStore::Scene>();
     m_ImGui = std::make_unique<ALStore::ImGuiLayer>();
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
     AL_INFO("Window init");
@@ -22,6 +23,14 @@ bool Engine::init() {
     m_TextureLibrary->init();
     m_TextureLibrary->Load("assets/textures/Truck2.png");
     m_texture = m_TextureLibrary->Get("Truck2.png");
+    m_ActiveScene.reset(new Scene());
+    //m_Store = m_ActiveScene->CreateEntity("store1");
+    
+     auto square = m_ActiveScene->CreateEntity();
+    m_ActiveScene->Reg().emplace<TransformComponent>(square);
+    m_ActiveScene->Reg().emplace<SpriteRendererComponent>(square, glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+
+    m_SquareEntity = square;
     m_Renderer->Init();
     if (!m_ImGui->init()) AL_CORE_ERROR("ImGui failure!");
  
@@ -79,6 +88,10 @@ void Engine::run() {
                 show_another_window = false;
             ImGui::End();
         }
+        ImGui::Begin("Settings");
+        auto& squareColor = m_ActiveScene->Reg().get<SpriteRendererComponent>(m_SquareEntity).Color;
+        ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+        ImGui::End();
 
         // Rendering
 
@@ -91,6 +104,9 @@ void Engine::run() {
         m_texture->Bind();
         glm::mat4 transform2 = ALStore::Maths::getTransform(m_size, m_position);
         m_Renderer->DrawTexture(transform2, m_texture, { 1.0f, 1.0f, 1.0f, 1.0f });
+
+        //m_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
+        //m_Renderer->DrawSprite(m_Store.GetComponent<TransformComponent>().Transform, m_Store.GetComponent<SpriteRendererComponent>(), m_Store.GetComponent<IDComponent>().ID);
         m_Renderer->EndScene();
         m_ImGui->render();
         m_Window->OnUpdate();

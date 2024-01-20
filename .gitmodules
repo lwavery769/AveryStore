@@ -1,3 +1,15 @@
 [submodule "include/stb_image"]
 	path = include/stb_image
-	url = https://github.com/nothings/stb.git
+	url = https://github.com/nothings/stb
+[submodule "include/spdlog"]
+	path = include/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "include/glm"]
+	path = include/glm
+	url = https://github.com/g-truc/glm
+[submodule "include/rapidXML"]
+	path = include/rapidXML
+	url = https://github.com/viriw/rapidxml.git
+[submodule "include/entt"]
+	path = include/entt
+	url = https://github.com/skypjack/entt.git

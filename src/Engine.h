@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <Windows.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h> 
 #include "glad/include/glad/glad.h"
@@ -19,6 +20,8 @@
 #include "render/TextureLibrary.h"
 #include "render/Render2D.h"
 #include "render/Maths.h"
+#include "scene/Scene.h"
+//#include "scene/Entity.h"
 
 using namespace ALStore;
 class Engine
@@ -30,6 +33,7 @@ public:
 	void run();
 	static Engine& Get() { return *s_Instance; }
 	ALStore::Window& GetWindow() { return *m_Window; }
+	//Scene& GetScene() { return *m_ActiveScene; }
 
 private:
 	//GLFWwindow* m_Window;
@@ -38,6 +42,7 @@ private:
 	std::unique_ptr<ALStore::Render2D> m_Renderer;
 	std::unique_ptr<ALStore::ImGuiLayer> m_ImGui;
 	std::shared_ptr<Texture2D> m_texture;
+	std::shared_ptr<Scene> m_ActiveScene;
 	bool show_demo_window = true;
 	bool show_another_window = false; 
 	//GLFWwindow* s_Window; int ww, wh;
@@ -50,6 +55,9 @@ private:
 	float m_CameraTranslationSpeed = .2250f, m_CameraRotationSpeed = 180.0f;
 	glm::vec2 m_size = { .75f, .75f };
 	glm::vec3 m_position = { 0.5f, 0.5f, 0.0f };
+	//Entity m_Store;
+	entt::entity m_SquareEntity;
+
 	void OnEvent(Event& e);
 	bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
 	bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
