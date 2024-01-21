@@ -1,7 +1,7 @@
 #include "mypch.h"
 #include "Scene.h"
-
-
+#include "Componets.h"
+#include "Entity.h"
 #include "render/Render2D.h"
 
 #include <glm/glm/glm.hpp>
@@ -49,9 +49,13 @@ namespace ALStore {
 	{
 	}
 
-	entt::entity Scene::CreateEntity()
+	Entity Scene::CreateEntity(const std::string& name)
 	{
-		return m_Registry.create();
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<TransformComponent>();
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.Tag = name.empty() ? "Entity" : name;
+		return entity;
 	}
 
 	void Scene::OnUpdate(Timestep ts)
@@ -61,7 +65,7 @@ namespace ALStore {
 		{
 			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			Render2D::DrawSprite(transform, sprite.Color, -1);
+			//Render2D::DrawSprite(transform, sprite.Color, -1);
 		}
 
 

@@ -21,7 +21,7 @@
 #include "render/Render2D.h"
 #include "render/Maths.h"
 #include "scene/Scene.h"
-//#include "scene/Entity.h"
+#include "scene/Entity.h"
 
 using namespace ALStore;
 class Engine
@@ -41,7 +41,7 @@ private:
 	std::unique_ptr <ALStore::TextureLibrary> m_TextureLibrary;
 	std::unique_ptr<ALStore::Render2D> m_Renderer;
 	std::unique_ptr<ALStore::ImGuiLayer> m_ImGui;
-	std::shared_ptr<Texture2D> m_texture;
+	std::shared_ptr<Texture2D> m_texture, m_StoreTxt;
 	std::shared_ptr<Scene> m_ActiveScene;
 	bool show_demo_window = true;
 	bool show_another_window = false; 
@@ -55,8 +55,8 @@ private:
 	float m_CameraTranslationSpeed = .2250f, m_CameraRotationSpeed = 180.0f;
 	glm::vec2 m_size = { .75f, .75f };
 	glm::vec3 m_position = { 0.5f, 0.5f, 0.0f };
-	//Entity m_Store;
-	entt::entity m_SquareEntity;
+	Entity m_Store;
+	entt::entity  m_SquareEntity;
 
 	void OnEvent(Event& e);
 	bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);

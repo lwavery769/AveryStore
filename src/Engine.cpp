@@ -1,5 +1,6 @@
 #include "mypch.h"
 #include "Engine.h"
+#include "scene/Componets.h"
 #include "core/KeyCodes.h"
 
 #define BIND_EVENT_FN(x) std::bind(&Engine::x, this, std::placeholders::_1)
@@ -20,17 +21,21 @@ bool Engine::init() {
     AL_INFO("Window init");
     m_Window->init(1400, 800);
     m_Window->setRunning(true);
+
     m_TextureLibrary->init();
     m_TextureLibrary->Load("assets/textures/Truck2.png");
     m_texture = m_TextureLibrary->Get("Truck2.png");
-    m_ActiveScene.reset(new Scene());
-    //m_Store = m_ActiveScene->CreateEntity("store1");
-    
-     auto square = m_ActiveScene->CreateEntity();
-    m_ActiveScene->Reg().emplace<TransformComponent>(square);
-    m_ActiveScene->Reg().emplace<SpriteRendererComponent>(square, glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
-    m_SquareEntity = square;
+    m_ActiveScene.reset(new Scene());
+    m_Store = m_ActiveScene->CreateEntity("store1");
+    m_Store.AddComponent<IDComponent>(13466807492172565454);  
+    m_StoreTxt = std::make_shared<Texture2D>("assets/Textures/Store.png");
+    m_Store.AddComponent<SpriteRendererComponent>(m_StoreTxt);
+    
+
+    m_position = { -1.533f, 0.762f, 0.0f };
+    m_size = { 0.432f, 1.096f };
+    m_Store.GetComponent<TransformComponent>().Transform = Maths::getTransform(m_size, m_position);
     m_Renderer->Init();
     if (!m_ImGui->init()) AL_CORE_ERROR("ImGui failure!");
  
@@ -56,43 +61,6 @@ void Engine::run() {
     {
         m_Renderer->BeginScene(m_Camera);
         m_ImGui->begin();
-   
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
-        }
-        ImGui::Begin("Settings");
-        auto& squareColor = m_ActiveScene->Reg().get<SpriteRendererComponent>(m_SquareEntity).Color;
-        ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
-        ImGui::End();
-
         // Rendering
 
         int display_w, display_h;
@@ -104,9 +72,9 @@ void Engine::run() {
         m_texture->Bind();
         glm::mat4 transform2 = ALStore::Maths::getTransform(m_size, m_position);
         m_Renderer->DrawTexture(transform2, m_texture, { 1.0f, 1.0f, 1.0f, 1.0f });
-
-        //m_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
-        //m_Renderer->DrawSprite(m_Store.GetComponent<TransformComponent>().Transform, m_Store.GetComponent<SpriteRendererComponent>(), m_Store.GetComponent<IDComponent>().ID);
+        
+        m_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
+        m_Renderer->DrawSprite(m_Store.GetComponent<TransformComponent>().Transform, m_Store.GetComponent<SpriteRendererComponent>(), m_Store.GetComponent<IDComponent>().ID);
         m_Renderer->EndScene();
         m_ImGui->render();
         m_Window->OnUpdate();

@@ -2,10 +2,11 @@
 
 #include "../../include/entt/single_include/entt/entt.hpp"
 
-#include "Componets.h"
+//#include "Componets.h"
 #include "core/Timestep.h"
 
 namespace ALStore {
+	class Entity;
 
 	class Scene
 	{
@@ -13,14 +14,11 @@ namespace ALStore {
 		Scene();
 		~Scene();
 
-		entt::entity CreateEntity();
-
-		// TEMP
-		entt::registry& Reg() { return m_Registry; }
-
+		Entity CreateEntity(const std::string& name = std::string());
 		void OnUpdate(Timestep ts);
 	private:
 		entt::registry m_Registry;
+		friend class Entity;
 	};
 
 }

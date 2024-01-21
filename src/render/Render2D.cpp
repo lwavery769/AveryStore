@@ -101,9 +101,9 @@ namespace ALStore {
 		s_Data.QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data.flatColorShader.reset(new Shader("assets/shaders/flatColor.glsl"));
-		s_Data.TruckTexture.reset(new Texture2D("assets/textures/Truck2.png"));
+		/*s_Data.TruckTexture.reset(new Texture2D("assets/textures/Truck2.png"));
 		s_Data.TextureSlots[1] = s_Data.TruckTexture;
-		s_Data.TextureSlotIndex++;
+		s_Data.TextureSlotIndex++;*/
 	}
 	void Render2D::BeginScene(OrthographicCamera& camera)
 	{
@@ -142,7 +142,7 @@ namespace ALStore {
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-/*	void Render2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	void Render2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
 		//DrawQuad(transform, src.Color, entityID);
 		if (src.Texture) {
@@ -150,8 +150,8 @@ namespace ALStore {
 			//src.Texture->unBind();
 		}
 		else
-			DrawSprite(transform, src.Color, entityID);//
-	}*/
+		DrawSprite(transform, src.Color, entityID);//
+	}
 	void Render2D::DrawSprite(const glm::mat4& transform, const glm::vec4& color, int entityID) {
 		//HZ_PROFILE_FUNCTION();
 		constexpr size_t quadVertexCount = 4;
@@ -169,7 +169,7 @@ namespace ALStore {
 		}
 		s_Data.QuadIndexCount += 6;	//s_Data.Stats.QuadCount++;
 	}
-	/*void Render2D::DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID)
+	void Render2D::DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID)
 	{
 		//HZ_PROFILE_FUNCTION();
 		constexpr size_t quadVertexCount = 4;
@@ -207,7 +207,7 @@ namespace ALStore {
 		s_Data.QuadIndexCount += 6;
 
 		//s_Data.Stats.QuadCount++;
-	}*/
+	}
 	void Render2D::DrawTexture(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec4& tintColor) 
 	{
 		//HZ_PROFILE_FUNCTION();
