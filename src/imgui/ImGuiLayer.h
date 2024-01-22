@@ -7,6 +7,7 @@ namespace ALStore {
 		~ImGuiLayer();
 		bool init();
 		void begin();
+		void OnDetach();
 		void render();
 		void end();
 GLFWwindow* s_Window; int ww, wh;

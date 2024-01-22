@@ -6,7 +6,7 @@
 #include "Shader.h"
 #include "Texture2D.h"
 #include "OrthographicCamera.h"
-#include "../scene/Componets.h"
+#include "../scene/Components.h"
 
 namespace ALStore {
 	class Render2D

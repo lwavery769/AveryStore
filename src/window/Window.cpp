@@ -178,5 +178,5 @@ namespace ALStore {
 		glfwSwapBuffers(m_Window);
 		showFPS(m_Window);
 	}
-	void Window::OnShutdown() { glfwTerminate(); }
+	void Window::OnShutdown() { glfwDestroyWindow(m_Window); glfwTerminate(); }
 }

@@ -1,7 +1,10 @@
 #include "mypch.h"
 #include "Engine.h"
-#include "scene/Componets.h"
+#include "scene/Components.h"
 #include "core/KeyCodes.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/glm/ext.hpp"
+
 
 #define BIND_EVENT_FN(x) std::bind(&Engine::x, this, std::placeholders::_1)
 Engine* Engine::s_Instance = nullptr;
@@ -27,15 +30,22 @@ bool Engine::init() {
     m_texture = m_TextureLibrary->Get("Truck2.png");
 
     m_ActiveScene.reset(new Scene());
-    m_Store = m_ActiveScene->CreateEntity("store1");
-    m_Store.AddComponent<IDComponent>(13466807492172565454);  
-    m_StoreTxt = std::make_shared<Texture2D>("assets/Textures/Store.png");
-    m_Store.AddComponent<SpriteRendererComponent>(m_StoreTxt);
-    
+    m_ActiveScene->LoadXML("assets/Entities.xml"); AL_INFO("Scene XML loaded");
 
-    m_position = { -1.533f, 0.762f, 0.0f };
-    m_size = { 0.432f, 1.096f };
-    m_Store.GetComponent<TransformComponent>().Transform = Maths::getTransform(m_size, m_position);
+    e_Store = m_ActiveScene->CreateEntity("store1");
+    e_Store.AddComponent<IDComponent>(13466807492172565454);  
+    m_StoreTxt = std::make_shared<Texture2D>("assets/Textures/Store.png");
+    e_Store.AddComponent<SpriteRendererComponent>(m_StoreTxt);
+    glm::vec2 store_size = { .402f, .750f }; glm::vec3 store_position = { 0.5f, 0.5f, 0.0f };
+    e_Store.GetComponent<TransformComponent>().Transform = Maths::getTransform(store_size, store_position);
+
+    e_Truck2 = m_ActiveScene->CreateEntity("truck2");
+    e_Truck2.AddComponent<IDComponent>(13466807492172565000);
+    m_Truck2Txt = std::make_shared<Texture2D>("assets/Textures/Truck2.png");
+    e_Truck2.AddComponent<SpriteRendererComponent>(m_Truck2Txt);
+    glm::vec2 truck2_size = { .451f, .750f }; glm::vec3 truck2_position = { 0.959f, 0.041f, 0.0f };
+    e_Truck2.GetComponent<TransformComponent>().Transform = Maths::getTransform(truck2_size, truck2_position);
+
     m_Renderer->Init();
     if (!m_ImGui->init()) AL_CORE_ERROR("ImGui failure!");
  
@@ -55,12 +65,12 @@ void Engine::OnEvent(Event& e)
     dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResizeEvent));
     //AL_CORE_TRACE("{0}", e);
 }
-void Engine::run() { 
+void Engine::run() { \
     m_Camera.SetProjection(-2, 2, -2, 2);
     while (m_Window->isRunning())
     {
         m_Renderer->BeginScene(m_Camera);
-        m_ImGui->begin();
+   //     m_ImGui->begin();
         // Rendering
 
         int display_w, display_h;
@@ -69,16 +79,46 @@ void Engine::run() {
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
-        m_texture->Bind();
-        glm::mat4 transform2 = ALStore::Maths::getTransform(m_size, m_position);
-        m_Renderer->DrawTexture(transform2, m_texture, { 1.0f, 1.0f, 1.0f, 1.0f });
+ /*       m_texture->Bind(); glm::mat4 transform2 = ALStore::Maths::getTransform(m_size, m_position);
+        m_Renderer->DrawTexture(transform2, m_texture, { 1.0f, 1.0f, 1.0f, 1.0f });*/
         
-        m_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
-        m_Renderer->DrawSprite(m_Store.GetComponent<TransformComponent>().Transform, m_Store.GetComponent<SpriteRendererComponent>(), m_Store.GetComponent<IDComponent>().ID);
+        e_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
+        m_Renderer->DrawSprite(e_Store.GetComponent<TransformComponent>().Transform, e_Store.GetComponent<SpriteRendererComponent>(), e_Store.GetComponent<IDComponent>().ID);
+       
+        e_Truck2.GetComponent<SpriteRendererComponent>().Texture->Bind();
+        m_Renderer->DrawSprite(e_Truck2.GetComponent<TransformComponent>().Transform, e_Truck2.GetComponent<SpriteRendererComponent>(), e_Truck2.GetComponent<IDComponent>().ID);
+
         m_Renderer->EndScene();
-        m_ImGui->render();
+      //  m_ImGui->render();
+      //  ImGuiEdit(e_Truck2);///// get truck
         m_Window->OnUpdate();
     }
+    m_ImGui->OnDetach();
+    m_Window->OnShutdown();
+}
+void Engine::ImGuiEdit(Entity entt){
+    m_ImGui->begin();
+    m_ImGui->render();
+
+    ImGui::SliderFloat("Position x :", &m_position.x, -4.0f, 4.0f, "ratio = %.3f");
+    ImGui::SliderFloat("Position y :", &m_position.y, -4.0f, 4.0f, "ratio = %.3f");
+    ImGui::SliderFloat("Position z :", &m_position.z, -4.0f, 4.0f, "ratio = %.3f");
+
+    ImGui::SliderFloat("Scale x :", &m_size.x, 0.0f, 2.50f, "ratio = %.3f");
+    ImGui::SliderFloat("Scale y :", &m_size.y, 0.0f, 2.50f, "ratio = %.3f");
+    ImGui::ColorEdit4("Square Color", glm::value_ptr(m_color));
+    if (ImGui::IsWindowHovered) {
+        entt.GetComponent<TransformComponent>().Translation.x = m_position.x;
+        entt.GetComponent<TransformComponent>().Translation.y = m_position.y;
+        entt.GetComponent<TransformComponent>().Translation.z = m_position.z;
+
+        entt.GetComponent<TransformComponent>().Scale.x = m_size.x;
+        entt.GetComponent<TransformComponent>().Scale.y = m_size.y;
+        entt.GetComponent<TransformComponent>().Transform = entt.GetComponent<TransformComponent>().GetTransform();
+        entt.GetComponent<SpriteRendererComponent>().Color = m_color;
+    }
+    m_ImGui->end();
+
 }
 bool Engine::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e) {
     //HZ_PROFILE_FUNCTION("MousePicking");

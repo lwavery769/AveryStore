@@ -138,7 +138,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\scene\Scene.cpp" />
+    <ClCompile Include="src\scene\Scene.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="src\core\UUID.cpp" />
     <ClCompile Include="src\imgui\ImGuiLayer.cpp" />
     <ClCompile Include="src\mypch.cpp">
@@ -185,6 +188,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\window\Window.cpp" />
+    <ClCompile Include="src\scene\XMLClass.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\scene\Entity.h" />
@@ -206,8 +213,9 @@
     <ClInclude Include="src\render\Texture2D.h" />
     <ClInclude Include="src\render\TextureLibrary.h" />
     <ClInclude Include="src\render\VertexArray.h" />
-    <ClInclude Include="src\scene\Componets.h" />
+    <ClInclude Include="src\scene\Components.h" />
     <ClInclude Include="src\window\Window.h" />
+    <ClInclude Include="src\scene\XMLClass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
