@@ -13,29 +13,30 @@ using namespace std;
 namespace ALStore {
 	static const uint32_t s_MapWidth = 24;
 	static const char* s_MapTiles =
-		"WWWSSSSSSSSSSSWWWWWWWWWW"
-		"WWWTGGGGGGGGGGRWWWWWWWWW"
-		"WWWTGGGGGGGGGGRWWWWWWWWW"
-		"WWWTGGGGGGGGGGGGGRWWWWWW"
-		"WWWTGGGGGGGGGGGGGGUWWWWW"
-		"WWWTGGGGGGGGGGGGGGUWWWWW"
-		"WWWTGGGGGGGGGGGGGGUWWWWW"
-		"WWWTGGGGGGGGGGGGGGUWWWWW"
-		"WWWTGGGGGGGGGGGGQVWWWWWW"
-		"WWWVVVVVVVVWWWWWWWWWWWWW";
+		"WWWWWSSSSSSSSSSWWWWWWWWW"
+		"WWWWTGGGGGGGGGGUWWWWWWWW"
+		"WWWWTGGGGGGGGGGRSSSWWWWW"
+		"WWWWTGGGGGGGGGGGGGGUWWWW"
+		"WWWWTGGGGGGGGGGGGGGUWWWW"
+		"WWWWTGGGGGGGGGGGGGGUWWWW"
+		"WWWWTGGGGGGGGGGGGGGUWWWW"
+		"WWWWTGGGGGGGGGGGGGGUWWWW"
+		"WWWWTGGGGGGGGGGGGQVWWWWW"
+		"WWWWWVVVVVVVVVVVVWWWWWWW";
 
 	static void DoMath(const glm::mat4& transform)
 	{
 
 	}
-
 	static void OnTransformConstruct(entt::registry& registry, entt::entity entity)
 	{
 
 	}
 
-	Scene::Scene()
+	Scene::Scene() : m_size({ 1.0, 1.0 }), m_position({ 0.0, 0.0, 0.0 })
 	{
+		m_SpriteSheet = std::make_shared<Texture2D>("assets/textures/RPGpack_sheet_2X.png");
+
 #if ENTT_EXAMPLE_CODE
 		entt::entity entity = m_Registry.create();
 		m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f));
@@ -181,6 +182,44 @@ namespace ALStore {
 			nodeFrame = nodeFrame->next_sibling();
 		}
 	}
+	void Scene::drawMap() {
+		//HZ_PROFILE_FUNCTION();
+		float xCoord = 0.0f; float yCoord = 0.0f;
+		m_SpriteSheet->Bind();
+		m_MapWidth = s_MapWidth; m_MapHeight = strlen(s_MapTiles) / s_MapWidth;
+		for (uint32_t y = 0; y < m_MapHeight; y++) {
+			for (uint32_t x = 0; x < m_MapWidth; x++) {
+				char tileType = s_MapTiles[x + y * m_MapWidth];
+				switch (tileType) {
+				case 'D': xCoord = 6.0f; yCoord = 11.0f; break;
+				case 'G': xCoord = 1.0f; yCoord = 11.0f; break;
+				case 'Q': xCoord = 10.0f; yCoord = 12.0f; break;
+				case 'R': xCoord = 10.0f; yCoord = 10.0f; break;
+				case 'S': xCoord = 11.0f; yCoord = 10.0f; break;
+				case 'T': xCoord = 12.0f; yCoord = 11.0f; break;
+				case 'U': xCoord = 10.0f; yCoord = 11.0f; break;
+				case 'V': xCoord = 11.0f; yCoord = 12.0f; break;
+				case 'W': xCoord = 11.0f; yCoord = 11.0f; break;
+				case 'X': xCoord = 12.0f; yCoord = 10.0f; break;
+				case 'Y': xCoord = 12.0f; yCoord = 12.0f; break;
+				default: break;
+				}
+				m_position = { x - m_MapWidth / 2.0f, m_MapHeight - y - m_MapHeight / 2.0f, 0.0f };
+				//quotient = dividend / divisor;remainder = dividend % divisor;		
+				coords = { xCoord, yCoord };
+				draw.DrawTile(Maths::getTransform(m_size, m_position), m_SpriteSheet, coords, tintColor);
+			}
+		}
+		drawRoads();
+	}
+	void Scene::drawRoads() {
+		float xCoord = 14.0f; float yCoord = 9.0f; m_position = { -2.0f,0.0f,0.0f }; glm::vec2 rSize = { 0.5,0.5 };
+		coords = { xCoord, yCoord };
+		for (int i = 0; i < 16; i++) {
+			m_position.x += .5f;
+			draw.DrawTile(Maths::getTransform(rSize, m_position), m_SpriteSheet, coords, tintColor);
+		}
+	}
 	void Scene::OnUpdate(Timestep ts)
 	{
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
@@ -191,7 +230,22 @@ namespace ALStore {
 			//Render2D::DrawSprite(transform, sprite.Color, -1);
 		}
 
+		/*   entt::registry& reg = m_ActiveScene->Reg();
+   for (auto&& [entity, trnf, txt]
+	   : reg.group<TransformComponent>(entt::get<SpriteRendererComponent>).each()) {
+		   txt.Texture->Bind();
+   }
+   auto view = reg.view<IDComponent>();
+   for (auto entity : view)
+   {
+	   IDComponent& entID = view.get<IDComponent>(entity);
 
+   }
+   auto group = reg.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+
+   e_Truck2.GetComponent<SpriteRendererComponent>().Texture->Bind();
+   m_Renderer->DrawSprite(e_Truck2.GetComponent<TransformComponent>().Transform, e_Truck2.GetComponent<SpriteRendererComponent>(), e_Truck2.GetComponent<IDComponent>().eID);
+*/
 	}
 
 }

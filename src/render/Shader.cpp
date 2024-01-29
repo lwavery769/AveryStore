@@ -2,17 +2,18 @@
 #include "Shader.h"
 #include <glad/glad.h>
 
-namespace ALStore{
-static GLenum ShaderTypeFromString(const std::string& type)
-{
-	if (type == "vertex")
-		return GL_VERTEX_SHADER;
-	if (type == "fragment" || type == "pixel")
-		return GL_FRAGMENT_SHADER;
+namespace ALStore {
+	static GLenum ShaderTypeFromString(const std::string& type)
+	{
+		if (type == "vertex")
+			return GL_VERTEX_SHADER;
+		if (type == "fragment" || type == "pixel")
+			return GL_FRAGMENT_SHADER;
 
-	//AL_CORE_ASSERT(false, "Unknown shader type!");
-	return 0;
-}
+		//AL_CORE_ASSERT(false, "Unknown shader type!");
+		return 0;
+	}
+	Shader::Shader() {}
 
 Shader::Shader(const std::string& filepath)
 {

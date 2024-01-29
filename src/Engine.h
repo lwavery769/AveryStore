@@ -11,6 +11,7 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 #include "window/Window.h"
+#include "core/Timestep.h"
 #include "events/Event.h"
 #include "events/ApplicationEvent.h"
 #include "events/MouseEvent.h"
@@ -19,7 +20,9 @@
 #include "imgui/ImGuiLayer.h"
 #include "render/TextureLibrary.h"
 #include "render/Render2D.h"
+#include "render/Shader.h"
 #include "render/Maths.h"
+#include "render/Framebuffer.h"
 #include "scene/Scene.h"
 #include "scene/Entity.h"
 #include "scene/XMLClass.h"
@@ -38,25 +41,37 @@ public:
 private:
 	//GLFWwindow* m_Window;
 	std::unique_ptr<ALStore::Window> m_Window;
-	std::unique_ptr <ALStore::TextureLibrary> m_TextureLibrary;
+	std::unique_ptr<ALStore::TextureLibrary> m_TextureLibrary;
 	std::unique_ptr<ALStore::Render2D> m_Renderer;
 	std::unique_ptr<ALStore::ImGuiLayer> m_ImGui;
-	std::shared_ptr<Texture2D> m_texture, m_StoreTxt, m_Truck2Txt;
-	std::shared_ptr<Scene> m_ActiveScene;
+	std::shared_ptr<ALStore::Texture2D> m_texture, m_StoreTxt, m_Truck2Txt;
+	std::shared_ptr<ALStore::Scene> m_ActiveScene;
+	std::shared_ptr<ALStore::Shader> fbShader;
+	std::shared_ptr<ALStore::OpenGLFramebuffer> m_Framebuffer; ALStore::FramebufferSpecification fbSpec;
+	
 	bool show_demo_window = true;
 	bool show_another_window = false; 
 	//GLFWwindow* s_Window; int ww, wh;
 	glm::vec4 clear_color = glm::vec4(0.45f, 0.55f, 0.60f, 1.00f);
-	glm::vec2 m_mousePos = { .75f, .75f };
+	//glm::vec2 m_mousePos = { .75f, .75f };
 	bool m_Minimized = false;
+	Timestep ts;
+    double const limitFPS = 1.0 / 60.0;
+	double lastTime = glfwGetTime(), timer = lastTime;
+	double deltaTime = 0, nowTime = 0;
+	int frames = 0, updates = 0;
+	void update();
+	void render();
 	ALStore::OrthographicCamera m_Camera;
 	float m_AspectRatio = 1.0f;
-	float m_ZoomLevel = 1.25f;
+	float m_ZoomLevel = 6.5f;
 	float m_CameraTranslationSpeed = .2250f, m_CameraRotationSpeed = 180.0f;
 	glm::vec2 m_size = { .75f, .75f };
 	glm::vec3 m_position = { 0.5f, 0.5f, 0.0f };
 	glm::vec4 m_color = { 0.5f, 0.5f, 0.0f, 1.0f };
 	Entity e_Store, e_Truck2;
+	glm::vec2 truck2_size = { .451f, .750f };
+	glm::vec3 truck2_position = { 5.787f, 0.041f, 0.0f };
 	entt::entity  m_SquareEntity;
 	XMLClass XMLClass;
 	void ImGuiEdit(Entity entt);

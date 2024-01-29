@@ -194,6 +194,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\events\ApplicationEvent.h" />
+    <ClInclude Include="src\events\Event.h" />
+    <ClInclude Include="src\events\KeyEvent.h" />
+    <ClInclude Include="src\events\MouseEvent.h" />
     <ClInclude Include="src\scene\Entity.h" />
     <ClInclude Include="src\scene\Scene.h" />
     <ClInclude Include="src\core\Timestep.h" />
@@ -216,6 +220,12 @@
     <ClInclude Include="src\scene\Components.h" />
     <ClInclude Include="src\window\Window.h" />
     <ClInclude Include="src\scene\XMLClass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\fbShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="assets\Entities.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

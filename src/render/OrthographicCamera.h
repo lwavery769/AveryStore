@@ -24,7 +24,7 @@ namespace ALStore {
 		glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);;
 		glm::mat4 m_ViewMatrix;
 		glm::mat4 m_ViewProjectionMatrix;
-		float m_AspectRatio; float m_ZoomLevel = 1.25f;
+		float m_AspectRatio; float m_ZoomLevel = 5.0f;
 		glm::vec3 m_Position = { 0.1f, 0.1f, 0.0f };
 		float m_Rotation = 0.0f;
 	};

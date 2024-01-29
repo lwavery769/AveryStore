@@ -7,12 +7,14 @@
 namespace ALStore {
 	struct IDComponent
 	{
-		UUID ID;
+		int eID;
+		//UUID ID;
 
 		IDComponent() = default;
 		IDComponent(const IDComponent&) = default;
-		IDComponent(UUID uuid)
-			: ID(uuid) {}
+		IDComponent(int ID)
+			: eID(ID) {}
+		//IDComponent(UUID uuid) : ID(uuid) {}
 	};
 
 	struct TagComponent

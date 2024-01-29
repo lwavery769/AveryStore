@@ -8,6 +8,7 @@ namespace ALStore{
 class Shader
 	{
 	public:
+		Shader();
 		Shader(const std::string& filepath);
 		Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
 		~Shader();

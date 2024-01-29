@@ -7,6 +7,20 @@
 
 
 #define BIND_EVENT_FN(x) std::bind(&Engine::x, this, std::placeholders::_1)
+struct s_LeftMouseBtn {
+    bool isPressed = false;
+    int x, y;
+}; s_LeftMouseBtn m_LeftMouseBtn;
+glm::vec3 decode_id(int id) {
+    int r = id / 65536;
+    int g = (id - r * 65536) / 256;
+    int b = (id - r * 65536 - g * 256);
+    // convert to floats. only divide by 255, because range is 0-255
+    return glm::vec3((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f);
+}
+int encode_id(int r, int g, int b) {
+    return b + g * 256 + r * 256 * 256;
+}
 Engine* Engine::s_Instance = nullptr;
 Engine::Engine() : m_Camera(1.0f, 1.0f, 1.0f, 1.0f) { s_Instance = this; }
 Engine::~Engine() {}
@@ -19,12 +33,21 @@ bool Engine::init() {
     m_TextureLibrary = std::make_unique<ALStore::TextureLibrary>();
     m_Renderer = std::make_unique<ALStore::Render2D>();
     //m_ActiveScene = std::make_shared<ALStore::Scene>();
+    //fbShader = std::make_shared<ALStore::Shader>();
+    //fbShader = std::make_shared<ALStore::Shader>("assets/shaders/fbShader.glsl");
+    //= std::make_shared<ALStore::Shader>("assets/shaders/fbShader.glsl");
+
     m_ImGui = std::make_unique<ALStore::ImGuiLayer>();
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
     AL_INFO("Window init");
     m_Window->init(1400, 800);
     m_Window->setRunning(true);
-
+    
+    fbSpec.Attachments = { ALStore::FramebufferTextureFormat::RGBA8, ALStore::FramebufferTextureFormat::RED_INTEGER, ALStore::FramebufferTextureFormat::Depth };
+    fbSpec.Width = 1400;
+    fbSpec.Height = 800;
+    m_Framebuffer.reset(new ALStore::OpenGLFramebuffer(fbSpec));
+    uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
     m_TextureLibrary->init();
     m_TextureLibrary->Load("assets/textures/Truck2.png");
     m_texture = m_TextureLibrary->Get("Truck2.png");
@@ -33,17 +56,18 @@ bool Engine::init() {
     m_ActiveScene->LoadXML("assets/Entities.xml"); AL_INFO("Scene XML loaded");
 
     e_Store = m_ActiveScene->CreateEntity("store1");
-    e_Store.AddComponent<IDComponent>(13466807492172565454);  
+    e_Store.AddComponent<IDComponent>(1304);  
     m_StoreTxt = std::make_shared<Texture2D>("assets/Textures/Store.png");
     e_Store.AddComponent<SpriteRendererComponent>(m_StoreTxt);
     glm::vec2 store_size = { .402f, .750f }; glm::vec3 store_position = { 0.5f, 0.5f, 0.0f };
     e_Store.GetComponent<TransformComponent>().Transform = Maths::getTransform(store_size, store_position);
 
     e_Truck2 = m_ActiveScene->CreateEntity("truck2");
-    e_Truck2.AddComponent<IDComponent>(13466807492172565000);
+    e_Truck2.AddComponent<IDComponent>(134);
     m_Truck2Txt = std::make_shared<Texture2D>("assets/Textures/Truck2.png");
     e_Truck2.AddComponent<SpriteRendererComponent>(m_Truck2Txt);
-    glm::vec2 truck2_size = { .451f, .750f }; glm::vec3 truck2_position = { 0.959f, 0.041f, 0.0f };
+
+   
     e_Truck2.GetComponent<TransformComponent>().Transform = Maths::getTransform(truck2_size, truck2_position);
 
     m_Renderer->Init();
@@ -65,32 +89,72 @@ void Engine::OnEvent(Event& e)
     dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResizeEvent));
     //AL_CORE_TRACE("{0}", e);
 }
-void Engine::run() { \
-    m_Camera.SetProjection(-2, 2, -2, 2);
-    while (m_Window->isRunning())
-    {
-        m_Renderer->BeginScene(m_Camera);
-   //     m_ImGui->begin();
-        // Rendering
-
-        int display_w, display_h;
-        
-        glfwGetFramebufferSize(m_Window->GetNativeWindow(), &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
+void Engine::update() {
+    if (truck2_position.x > .033f) {
+        truck2_position.x = truck2_position.x - .0075f;
+        e_Truck2.GetComponent<TransformComponent>().Transform = Maths::getTransform(truck2_size, truck2_position);
+    }
+}
+void Engine::render() {
+    m_Renderer->BeginScene(m_Camera);
+ //https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  /*       m_texture->Bind(); glm::mat4 transform2 = ALStore::Maths::getTransform(m_size, m_position);
         m_Renderer->DrawTexture(transform2, m_texture, { 1.0f, 1.0f, 1.0f, 1.0f });*/
-        
+        m_ActiveScene->drawMap();
         e_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
-        m_Renderer->DrawSprite(e_Store.GetComponent<TransformComponent>().Transform, e_Store.GetComponent<SpriteRendererComponent>(), e_Store.GetComponent<IDComponent>().ID);
+        m_Renderer->DrawSprite(e_Store.GetComponent<TransformComponent>().Transform, e_Store.GetComponent<SpriteRendererComponent>(), e_Store.GetComponent<IDComponent>().eID);
        
         e_Truck2.GetComponent<SpriteRendererComponent>().Texture->Bind();
-        m_Renderer->DrawSprite(e_Truck2.GetComponent<TransformComponent>().Transform, e_Truck2.GetComponent<SpriteRendererComponent>(), e_Truck2.GetComponent<IDComponent>().ID);
+        m_Renderer->DrawSprite(e_Truck2.GetComponent<TransformComponent>().Transform, e_Truck2.GetComponent<SpriteRendererComponent>(), e_Truck2.GetComponent<IDComponent>().eID);
+        //  m_Renderer->DrawQuad(e_Truck2.GetComponent<TransformComponent>().Transform, m_color,76);
+    m_Renderer->EndScene();
+}
+void Engine::run() { 
+    m_Camera.SetProjection(-5, 5, -5, 5);
+    while (m_Window->isRunning())
+    {
+        if (m_LeftMouseBtn.isPressed) {
+            m_Framebuffer->Bind();
+            int p = 0;
+            glClearColor(0.8f, 0.3f, 0.1f, 1);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            m_Renderer->Flush(); //YIPEE
+            e_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
+            m_Renderer->DrawSprite(e_Store.GetComponent<TransformComponent>().Transform, e_Store.GetComponent<SpriteRendererComponent>(), e_Store.GetComponent<IDComponent>().eID);
+            m_Framebuffer->ClearAttachment(1, 50);
+            p = m_Framebuffer->ReadPixel(1, m_LeftMouseBtn.x, fbSpec.Height - m_LeftMouseBtn.y);
+            printf("Pos %i, %i : %i\n", m_LeftMouseBtn.x, m_LeftMouseBtn.y, p);
+            decode_id(p);
+            m_Framebuffer->Unbind();
+            m_LeftMouseBtn.isPressed = false;
+        }
+        
+        // - Measure time
+        nowTime = glfwGetTime();
+        deltaTime += (nowTime - lastTime) / limitFPS;
+        lastTime = nowTime;
 
-        m_Renderer->EndScene();
+        // - Only update at 60 frames / s
+        while (deltaTime >= 1.0) {
+            update();   // - Update function
+            updates++;
+            deltaTime--;
+        }
+        // - Render at maximum possible frames
+        render(); // - Render function
+      //  ImGuiEdit(e_Truck2);
+        frames++;
+
+        // - Reset after one second
+        if (glfwGetTime() - timer > 1.0) {
+            timer++;
+            std::cout << "FPS: " << frames << " Updates:" << updates << std::endl;
+            updates = 0, frames = 0;
+        }
+    
       //  m_ImGui->render();
-      //  ImGuiEdit(e_Truck2);///// get truck
         m_Window->OnUpdate();
     }
     m_ImGui->OnDetach();
@@ -100,7 +164,7 @@ void Engine::ImGuiEdit(Entity entt){
     m_ImGui->begin();
     m_ImGui->render();
 
-    ImGui::SliderFloat("Position x :", &m_position.x, -4.0f, 4.0f, "ratio = %.3f");
+    ImGui::SliderFloat("Position x :", &m_position.x, -4.0f, 6.0f, "ratio = %.3f");
     ImGui::SliderFloat("Position y :", &m_position.y, -4.0f, 4.0f, "ratio = %.3f");
     ImGui::SliderFloat("Position z :", &m_position.z, -4.0f, 4.0f, "ratio = %.3f");
 
@@ -123,13 +187,14 @@ void Engine::ImGuiEdit(Entity entt){
 bool Engine::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e) {
     //HZ_PROFILE_FUNCTION("MousePicking");
     if (e.GetMouseButton() == 0) {
-        AL_INFO("MOUSE PRESSED{0}", e.GetMouseButton());
+        AL_INFO("MOUSE PRESSED{0}", e.GetMouseButton()); 
+        m_LeftMouseBtn.isPressed = true;
     }
     return false;
 }
 bool Engine::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e) { return false; }
 bool Engine::OnMouseMovedEvent(MouseMovedEvent& e) {
-    m_mousePos.x = e.GetX(); m_mousePos.y = e.GetY();//AL_CORE_INFO("{0}, {1}", m_mousePos.x, m_mousePos.y);
+    m_LeftMouseBtn.x = e.GetX(); m_LeftMouseBtn.y = e.GetY();//AL_CORE_INFO("{0}, {1}", m_mousePos.x, m_mousePos.y);
     return false;
 }
 bool Engine::OnMouseScrolledEvent(MouseScrolledEvent& e) {

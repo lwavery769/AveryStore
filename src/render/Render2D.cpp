@@ -12,6 +12,7 @@ namespace ALStore {
 		glm::vec4 Color;
 		glm::vec2 TexCoord;
 		float TexIndex;
+		float TilingFactor;
 		int EntityID;
 	};
 	struct Renderer2DStorage
@@ -25,6 +26,7 @@ namespace ALStore {
 		std::shared_ptr<VertexBuffer> QuadVertexBuffer;
 		std::shared_ptr<Shader> flatColorShader;
 		std::shared_ptr<Shader> TextureShader;
+		std::shared_ptr<Shader> fbTextShader;
 		std::shared_ptr<Texture2D> WhiteTexture;
 		std::shared_ptr<Texture2D> TruckTexture;
 
@@ -53,11 +55,12 @@ namespace ALStore {
 		s_Data.QuadVertexArray.reset(new VertexArray());
 		s_Data.QuadVertexBuffer.reset(new VertexBuffer(s_Data.MaxVertices * sizeof(QuadVertex)));
 		s_Data.QuadVertexBuffer->SetLayout({
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float4, "a_Color"    },
-			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float,  "a_TexIndex" },
-			{ ShaderDataType::Int,    "a_EntityID" }
+			{ ShaderDataType::Float3, "a_Position"     },
+			{ ShaderDataType::Float4, "a_Color"        },
+			{ ShaderDataType::Float2, "a_TexCoord"     },
+			{ ShaderDataType::Float,  "a_TexIndex"     },
+			{ ShaderDataType::Float,  "a_TilingFactor" },
+			{ ShaderDataType::Int,    "a_EntityID"     }
 				});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -89,7 +92,7 @@ namespace ALStore {
 		int32_t samplers[s_Data.MaxTextureSlots];
 		for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
 			samplers[i] = i;
-
+		s_Data.fbTextShader.reset(new Shader("assets/shaders/fbShader.glsl"));
 		s_Data.TextureShader.reset(new Shader("assets/shaders/TextureShader.glsl"));
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->UploadUniformIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
@@ -115,7 +118,7 @@ namespace ALStore {
 
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-
+		s_Data.TextureShader->UploadUniformInt("uniqueID", 52);
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 		//s_Data.TextureSlotIndex = 1;
@@ -142,10 +145,38 @@ namespace ALStore {
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+
+	void Render2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
+	{
+		//HZ_PROFILE_FUNCTION();
+	///	s_Data.fbTextShader->Bind(); 
+	//	s_Data.fbTextShader->UploadUniformInt("uniqueID", entityID);
+		constexpr size_t quadVertexCount = 4;
+		const float textureIndex = 0.0f; // White Texture
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		//const float tilingFactor = 1.0f;
+
+		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)	Flush();
+
+		for (size_t i = 0; i < quadVertexCount; i++)
+		{
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
+			s_Data.QuadVertexBufferPtr->Color = color;
+			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->TilingFactor = 1.0f;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
+			s_Data.QuadVertexBufferPtr++;
+		}
+
+		s_Data.QuadIndexCount += 5;
+	}
+
 	void Render2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
 		//DrawQuad(transform, src.Color, entityID);
 		if (src.Texture) {
+			//AL_CORE_INFO("Store id = {0}", entityID);
 			DrawTexture(transform, src, src.Color, entityID);
 			//src.Texture->unBind();
 		}
@@ -166,7 +197,8 @@ namespace ALStore {
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
-		}
+		}//
+		
 		s_Data.QuadIndexCount += 6;	//s_Data.Stats.QuadCount++;
 	}
 	void Render2D::DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID)
@@ -195,16 +227,17 @@ namespace ALStore {
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = src.Texture;
 			s_Data.TextureSlotIndex++;
 		}
-
+	//AL_CORE_INFO("eID = {0}", entityID);
 		for (size_t i = 0; i < quadVertexCount; i++) {
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->TilingFactor = 1.0f;
 			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
-		s_Data.QuadIndexCount += 6;
+		s_Data.QuadIndexCount += 5;
 
 		//s_Data.Stats.QuadCount++;
 	}
@@ -312,6 +345,8 @@ namespace ALStore {
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
 			s_Data.QuadVertexBufferPtr->TexCoord = txtrCrds[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->TilingFactor = 1.0f;
+			s_Data.QuadVertexBufferPtr->EntityID = -1;
 			s_Data.QuadVertexBufferPtr++;
 		}
 		s_Data.QuadIndexCount += 6;

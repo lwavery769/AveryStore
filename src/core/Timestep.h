@@ -1,4 +1,5 @@
 #pragma once
+#include <GLFW/glfw3.h> 
 namespace ALStore {
 
 class Timestep
@@ -8,7 +9,10 @@ public:
 		: m_Time(time)
 	{
 	}
-
+	float GetTime()
+	{
+		return glfwGetTime();
+	}
 	operator float() const { return m_Time; }
 
 	float GetSeconds() const { return m_Time; }

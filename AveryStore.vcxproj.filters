@@ -140,5 +140,23 @@
     <ClInclude Include="src\scene\XMLClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\events\MouseEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\events\KeyEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\events\Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\events\ApplicationEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\fbShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="assets\Entities.xml" />
   </ItemGroup>
 </Project>
