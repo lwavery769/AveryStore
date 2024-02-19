@@ -257,6 +257,10 @@ Shader::Shader(const std::string& filepath)
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
 	}
+	void Shader::UploadUniformFloat4(const std::string& name, const glm::vec4& value) {
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform4f(location, value.x, value.y, value.z, value.w);
+	}
 	void Shader::UploadUniformIntArray(const std::string& name, int* values, uint32_t count)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());

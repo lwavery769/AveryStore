@@ -11,18 +11,16 @@
 using namespace std;
 
 namespace ALStore {
-	static const uint32_t s_MapWidth = 24;
+	static const uint32_t s_MapWidth = 8;
 	static const char* s_MapTiles =
-		"WWWWWSSSSSSSSSSWWWWWWWWW"
-		"WWWWTGGGGGGGGGGUWWWWWWWW"
-		"WWWWTGGGGGGGGGGRSSSWWWWW"
-		"WWWWTGGGGGGGGGGGGGGUWWWW"
-		"WWWWTGGGGGGGGGGGGGGUWWWW"
-		"WWWWTGGGGGGGGGGGGGGUWWWW"
-		"WWWWTGGGGGGGGGGGGGGUWWWW"
-		"WWWWTGGGGGGGGGGGGGGUWWWW"
-		"WWWWTGGGGGGGGGGGGQVWWWWW"
-		"WWWWWVVVVVVVVVVVVWWWWWWW";
+		"WSWWWWWW"
+		"TGUWWWWW"
+		"TGRSSSWW"
+		"TGGGGGUW"
+		"TGGGGGUW"
+		"TGGGGGUW"
+		"TGGGQVWW"
+		"WVVVWWWW";
 
 	static void DoMath(const glm::mat4& transform)
 	{
@@ -108,9 +106,9 @@ namespace ALStore {
 
 		while (nodeFrame)
 		{
-			printf("ID = %s\n", nodeFrame->first_attribute("ID")->value());
+	//		printf("ID = %s\n", nodeFrame->first_attribute("ID")->value());
 			//entity.AddComponent<IDComponent>((uint64_t)nodeFrame->first_attribute("ID")->value());
-			printf("TagComponent = %s\n", nodeFrame->first_node("TagComponent")->value());
+	//		printf("TagComponent = %s\n", nodeFrame->first_node("TagComponent")->value());
 			//entity.AddComponent<TagComponent>(nodeFrame->first_node("TagComponent")->value());
 	//		 { 
 //				m_Registry.create(), this 
@@ -129,13 +127,16 @@ namespace ALStore {
 					{
 					case Translation: {
 						entTranslation = glm::make_vec3(child->value());
-						printf("Translation = %s\n", child->value()); break; }
+		//				printf("Translation = %s\n", child->value()); 
+						break; }
 					case Rotation: {
 						entRotation = glm::make_vec3(child->value());
-						printf("Rotation = %s\n", child->value()); break;	}
+		//				printf("Rotation = %s\n", child->value()); 
+						break; }
 					case Scale: {
 						entScale = glm::make_vec3(child->value());
-						printf("Scale = %s\n", child->value()); break;	}
+		//				printf("Scale = %s\n", child->value()); 
+						break;	}
 					default:  break;
 					}
 				}
@@ -160,10 +161,12 @@ namespace ALStore {
 					{
 					case Color: {
 						entity.GetComponent<SpriteRendererComponent>().Color = glm::make_vec4(child->value());
-						printf("SRC color = %s\n", child->value()); break; }
+			//			printf("SRC color = %s\n", child->value()); 
+						break; }
 					case Size: {
 						entity.GetComponent<SpriteRendererComponent>().Size = glm::make_vec2(child->value());
-						printf("SRC Size = %s\n", child->value()); break;
+			//			printf("SRC Size = %s\n", child->value()); 
+						break;
 					}
 					case Texture: {
 						std::string str(child->value());
@@ -171,10 +174,12 @@ namespace ALStore {
 						std::shared_ptr<Texture2D> enttTexture = s_TextureLibrary.Get(str);
 						//entity.GetComponent<SpriteRendererComponent>().mapPOS = s_TextureLibrary.MapPos(str);
 						entity.GetComponent<SpriteRendererComponent>().Texture = enttTexture;
-						printf("SRC Texture = %s\n", child->value()); break;	}
+			//			printf("SRC Texture = %s\n", child->value()); 
+						break;	}
 					case Name: {
 						entity.GetComponent<SpriteRendererComponent>().texNamne = child->value();
-						printf("SRC name = %s\n", child->value()); break; }
+			//			printf("SRC name = %s\n", child->value()); 
+						break; }
 					default:  break;
 					}
 				}
@@ -213,9 +218,9 @@ namespace ALStore {
 		drawRoads();
 	}
 	void Scene::drawRoads() {
-		float xCoord = 14.0f; float yCoord = 9.0f; m_position = { -2.0f,0.0f,0.0f }; glm::vec2 rSize = { 0.5,0.5 };
+		float xCoord = 14.0f; float yCoord = 9.0f; m_position = { -3.5f,0.0f,0.0f }; glm::vec2 rSize = { 0.5,0.5 };
 		coords = { xCoord, yCoord };
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 9; i++) {
 			m_position.x += .5f;
 			draw.DrawTile(Maths::getTransform(rSize, m_position), m_SpriteSheet, coords, tintColor);
 		}

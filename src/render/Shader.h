@@ -13,6 +13,7 @@ class Shader
 		Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
 		~Shader();
 		void UploadUniformInt(const std::string& name, int value);
+		void UploadUniformFloat4(const std::string& name, const glm::vec4& value);
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
 		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
 		void Bind() const;

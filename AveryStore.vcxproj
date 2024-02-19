@@ -192,6 +192,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\StoreInventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\events\ApplicationEvent.h" />
@@ -220,9 +221,11 @@
     <ClInclude Include="src\scene\Components.h" />
     <ClInclude Include="src\window\Window.h" />
     <ClInclude Include="src\scene\XMLClass.h" />
+    <ClInclude Include="src\StoreInventory.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\fbShader.glsl" />
+    <None Include="assets\Inventory.csv" />
+    <None Include="assets\fbShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="assets\Entities.xml" />

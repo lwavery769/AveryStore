@@ -45,12 +45,12 @@ namespace ALStore {
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		float squareVertices[5 * 4] = {
+	/*	float squareVertices[5 * 4] = {
 			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
 			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
 			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
 			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-		};
+		};*/
 		//	HZ_PROFILE_FUNCTION("Render Init");
 		s_Data.QuadVertexArray.reset(new VertexArray());
 		s_Data.QuadVertexBuffer.reset(new VertexBuffer(s_Data.MaxVertices * sizeof(QuadVertex)));
@@ -92,7 +92,6 @@ namespace ALStore {
 		int32_t samplers[s_Data.MaxTextureSlots];
 		for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
 			samplers[i] = i;
-		s_Data.fbTextShader.reset(new Shader("assets/shaders/fbShader.glsl"));
 		s_Data.TextureShader.reset(new Shader("assets/shaders/TextureShader.glsl"));
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->UploadUniformIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
@@ -115,10 +114,11 @@ namespace ALStore {
 
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
+		
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-		s_Data.TextureShader->UploadUniformInt("uniqueID", 52);
+
+		//s_Data.TextureShader->UploadUniformInt("uniqueID", 52);
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 		//s_Data.TextureSlotIndex = 1;
@@ -171,17 +171,12 @@ namespace ALStore {
 
 		s_Data.QuadIndexCount += 5;
 	}
-
-	void Render2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	void Render2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID, bool flipped)
 	{
-		//DrawQuad(transform, src.Color, entityID);
-		if (src.Texture) {
-			//AL_CORE_INFO("Store id = {0}", entityID);
-			DrawTexture(transform, src, src.Color, entityID);
-			//src.Texture->unBind();
+		if (src.Texture) {//AL_CORE_INFO("Store id = {0}", entityID);
+			DrawTexture(transform, src, src.Color, entityID, flipped);
 		}
-		else
-		DrawSprite(transform, src.Color, entityID);//
+		else DrawSprite(transform, src.Color, entityID);//
 	}
 	void Render2D::DrawSprite(const glm::mat4& transform, const glm::vec4& color, int entityID) {
 		//HZ_PROFILE_FUNCTION();
@@ -201,15 +196,13 @@ namespace ALStore {
 		
 		s_Data.QuadIndexCount += 6;	//s_Data.Stats.QuadCount++;
 	}
-	void Render2D::DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID)
+	void Render2D::DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID, bool flipped)
 	{
 		//HZ_PROFILE_FUNCTION();
 		constexpr size_t quadVertexCount = 4;
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };;
-		bool flipped = 1;
-		if (!flipped) {
-			constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
-		}
+		constexpr glm::vec2 textureCoordsF[] = { { 1.0f, 0.0f }, { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f } };
+		
 		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)  Flush();
 
 		float textureIndex = 0.0f;
@@ -227,18 +220,20 @@ namespace ALStore {
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = src.Texture;
 			s_Data.TextureSlotIndex++;
 		}
+	//	s_Data.TextureShader->UploadUniformInt("uniqueID", entityID);
+	//	s_Data.TextureShader->UploadUniformFloat4("u_Color", src.Color);
 	//AL_CORE_INFO("eID = {0}", entityID);
 		for (size_t i = 0; i < quadVertexCount; i++) {
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_Data.QuadVertexBufferPtr->TexCoord = flipped ? textureCoordsF[i] : textureCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TilingFactor = 1.0f;
 			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 		s_Data.QuadIndexCount += 5;
-
+		s_Data.TextureShader->Bind();////////
 		//s_Data.Stats.QuadCount++;
 	}
 	void Render2D::DrawTexture(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec4& tintColor) 
@@ -306,6 +301,8 @@ namespace ALStore {
 		txtrCrds[1] = { ((x + 1) * spriteW) / sheetW, (y * spriteH) / sheetH };
 		txtrCrds[2] = { ((x + 1) * spriteW) / sheetW, ((y + 1) * spriteH) / sheetH };
 		txtrCrds[3] = { (x * spriteW) / sheetW, ((y + 1) * spriteH) / sheetH };
+		
+		s_Data.TextureShader->UploadUniformFloat4("u_Color", tintColor);
 		//const float tilingFactor = 1.0f;
 		if (s_Data.QuadIndexCount >= s_Data.MaxIndices) Flush();
 		float textureIndex = 0.0f;
@@ -346,7 +343,7 @@ namespace ALStore {
 			s_Data.QuadVertexBufferPtr->TexCoord = txtrCrds[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TilingFactor = 1.0f;
-			s_Data.QuadVertexBufferPtr->EntityID = -1;
+			s_Data.QuadVertexBufferPtr->EntityID = 9335076965011521498;
 			s_Data.QuadVertexBufferPtr++;
 		}
 		s_Data.QuadIndexCount += 6;

@@ -41,11 +41,17 @@ namespace ALStore {
 		AL_CORE_INFO("  Vendor: {0}", (char*)glGetString(GL_VENDOR));
 		AL_CORE_INFO("  Renderer: {0}", (char*)glGetString(GL_RENDERER));
 		AL_CORE_INFO("  Version: {0}", (char*)glGetString(GL_VERSION));
-		
-
-		GLint major, minor;
+	
+		GLint major, minor, txtSize, combunits, max[1];
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &combunits);
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, max);
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &txtSize);
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
+		AL_CORE_INFO("  Max texture units: {0}", std::to_string(max[0]));
+		AL_CORE_INFO("  Combined texture units: {0}", std::to_string(combunits));
+		AL_CORE_INFO("  Max texture size: {0}", std::to_string(txtSize));
+
 		AL_CORE_INFO("  GL Version(integer) : major {0}", std::to_string(major));
 		AL_CORE_INFO("  GL Version(integer) : minor {0}", std::to_string(minor));
 
@@ -55,11 +61,7 @@ namespace ALStore {
 		//////////////////glEnable(GL_DEPTH_TEST); // enable depth-testing
 		glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 		glfwSwapInterval(0); //SetVSync(true);
-
-
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-
-		// Set GLFW callbacks
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);

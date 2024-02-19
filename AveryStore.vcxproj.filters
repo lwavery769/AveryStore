@@ -72,6 +72,9 @@
     <ClCompile Include="src\scene\XMLClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\StoreInventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -152,9 +155,13 @@
     <ClInclude Include="src\events\ApplicationEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\StoreInventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\fbShader.glsl" />
+    <None Include="assets\fbShader.glsl" />
+    <None Include="assets\Inventory.csv" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="assets\Entities.xml" />

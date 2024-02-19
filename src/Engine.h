@@ -26,16 +26,21 @@
 #include "scene/Scene.h"
 #include "scene/Entity.h"
 #include "scene/XMLClass.h"
+
+#include "StoreInventory.h"
 using namespace ALStore;
 class Engine
 {
 public:
 	Engine();
 	~Engine();
-	bool init();
+	bool init(); 
 	void run();
+	void update();
 	static Engine& Get() { return *s_Instance; }
 	ALStore::Window& GetWindow() { return *m_Window; }
+	bool Get$out() { return $out; }
+	void Set$out(bool o) { $out = o; }
 	//Scene& GetScene() { return *m_ActiveScene; }
 
 private:
@@ -44,11 +49,12 @@ private:
 	std::unique_ptr<ALStore::TextureLibrary> m_TextureLibrary;
 	std::unique_ptr<ALStore::Render2D> m_Renderer;
 	std::unique_ptr<ALStore::ImGuiLayer> m_ImGui;
-	std::shared_ptr<ALStore::Texture2D> m_texture, m_StoreTxt, m_Truck2Txt;
+	std::shared_ptr<ALStore::Texture2D> m_$texture, m_StoreTxt, m_Truck2Txt;
 	std::shared_ptr<ALStore::Scene> m_ActiveScene;
 	std::shared_ptr<ALStore::Shader> fbShader;
 	std::shared_ptr<ALStore::OpenGLFramebuffer> m_Framebuffer; ALStore::FramebufferSpecification fbSpec;
-	
+	StoreInventory storeInv; StoreInventory* m_Inventory_ptr;
+	void storeClicked(); bool m_StorePanel = false;
 	bool show_demo_window = true;
 	bool show_another_window = false; 
 	//GLFWwindow* s_Window; int ww, wh;
@@ -60,7 +66,7 @@ private:
 	double lastTime = glfwGetTime(), timer = lastTime;
 	double deltaTime = 0, nowTime = 0;
 	int frames = 0, updates = 0;
-	void update();
+	bool $out, $in;
 	void render();
 	ALStore::OrthographicCamera m_Camera;
 	float m_AspectRatio = 1.0f;
@@ -68,10 +74,13 @@ private:
 	float m_CameraTranslationSpeed = .2250f, m_CameraRotationSpeed = 180.0f;
 	glm::vec2 m_size = { .75f, .75f };
 	glm::vec3 m_position = { 0.5f, 0.5f, 0.0f };
-	glm::vec4 m_color = { 0.5f, 0.5f, 0.0f, 1.0f };
-	Entity e_Store, e_Truck2;
+	glm::vec4 m_colorG = { 0.0f, 1.0f, 0.0f, 1.0f };
+	glm::vec4 m_colorR = { 1.0f, 0.0f, 0.0f, 1.0f };
+	Entity e_$ign, e_Store, e_Truck2;
+	Entity m_HoveredEntity;
 	glm::vec2 truck2_size = { .451f, .750f };
-	glm::vec3 truck2_position = { 5.787f, 0.041f, 0.0f };
+	glm::vec3 truck2_position = { 1.2f, 0.041f, 0.0f };
+	bool m_Flipped = false; 
 	entt::entity  m_SquareEntity;
 	XMLClass XMLClass;
 	void ImGuiEdit(Entity entt);

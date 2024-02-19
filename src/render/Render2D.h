@@ -21,12 +21,13 @@ namespace ALStore {
 		static void DrawIndexed();
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
 		static void DrawQuad(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
-		void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int UUID = -1);
+		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int UUID = -1, bool flipped = false);
 		static void DrawSprite(const glm::mat4& transform, const glm::vec4& color, int entityID);
-		void DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID);
+		static void DrawTexture(const glm::mat4& transform, SpriteRendererComponent& src, const glm::vec4& tintColor, int entityID, bool flipped);
 		void DrawTexture(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec4& tintColor);
 		void DrawTile(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec2& tileCoords, const glm::vec4& tintColor);
 	private:
+		glm::vec4 uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		struct SceneData
 		{
 			glm::mat4 ViewProjectionMatrix;

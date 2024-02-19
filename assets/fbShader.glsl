@@ -33,6 +33,7 @@ in vec2 v_TexCoord;
 in float v_TexIndex;
 in flat int v_EntityID;
 
+uniform vec4 u_Color;
 uniform int uniqueID;
 uniform sampler2D u_Textures[32];
 void main()
@@ -41,10 +42,10 @@ void main()
 	vec4 texColor = v_Color;
 	switch(int(v_TexIndex))
 	{
-		case 0: texColor *= texture(u_Textures[0], v_TexCoord ); break;
-		case 1: texColor *= texture(u_Textures[1], v_TexCoord ); break;
-		case 2: texColor *= texture(u_Textures[2], v_TexCoord ); break;
-		case 3: texColor *= texture(u_Textures[3], v_TexCoord ); break;
+		case 0: texColor *= texture(u_Textures[0], v_TexCoord ) * u_Color; break;
+		case 1: texColor *= texture(u_Textures[1], v_TexCoord ) * u_Color; break;
+		case 2: texColor *= texture(u_Textures[2], v_TexCoord ) * u_Color; break;
+		case 3: texColor *= texture(u_Textures[3], v_TexCoord ) * u_Color; break;
 		case 4: texColor *= texture(u_Textures[4], v_TexCoord ); break;
 		case 5: texColor *= texture(u_Textures[5], v_TexCoord ); break;
 		case 6: texColor *= texture(u_Textures[6], v_TexCoord ); break;
