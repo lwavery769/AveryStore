@@ -1,4 +1,9 @@
 #pragma once
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+//#include "ImPlot/implot.h" 
+//#include "ImPlot/implot_internal.h"
 #include "../StoreInventory.h"
 namespace ALStore {
 	class ImGuiLayer
@@ -9,10 +14,12 @@ namespace ALStore {
 		bool init();
 		void begin();
 		void OnDetach();
-		void render();
+		void render(); 
+		void renderTabs();
+		void updateSales(double timer);
 		void end();
 		bool GetIMC() { return capMouse; }
-		void SetStoreClose(bool x) { m_closed = x; }
+		void StoreClick();
 		GLFWwindow* s_Window; int ww, wh;
 		string name[4];
 		double price[4];
@@ -21,7 +28,6 @@ namespace ALStore {
 		bool show_demo_window = true;
 		bool show_another_window = false;
 		bool capMouse; 
-		bool m_closed; 
 		std::shared_ptr<ALStore::StoreInventory> m_Products;
 		int items = 4;
 		std::string str[4];

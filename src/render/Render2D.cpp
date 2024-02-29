@@ -28,7 +28,7 @@ namespace ALStore {
 		std::shared_ptr<Shader> TextureShader;
 		std::shared_ptr<Shader> fbTextShader;
 		std::shared_ptr<Texture2D> WhiteTexture;
-		std::shared_ptr<Texture2D> TruckTexture;
+		///std::shared_ptr<Texture2D> TruckTexture;
 
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
@@ -236,16 +236,19 @@ namespace ALStore {
 		s_Data.TextureShader->Bind();////////
 		//s_Data.Stats.QuadCount++;
 	}
-	void Render2D::DrawTexture(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec4& tintColor) 
+	void Render2D::DrawTexture(const glm::mat4& transform, const std::shared_ptr<Texture2D>& texture, const glm::vec4& tintColor, int entityID, bool flipped)
 	{
 		//HZ_PROFILE_FUNCTION();
 		constexpr size_t quadVertexCount = 4;
-		glm::vec2* textureCoords = new glm::vec2[4];
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };;
+		constexpr glm::vec2 textureCoordsF[] = { { 1.0f, 0.0f }, { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f } };
+/*		glm::vec2* textureCoords = new glm::vec2[4];
 		textureCoords[0] = { 0.0f, 0.0f };
 		textureCoords[1] = { 1.0f, 0.0f };
 		textureCoords[2] = { 1.0f, 1.0f };
 		textureCoords[3] = { 0.0f, 1.0f };
-		//const float tilingFactor = 1.0f;
+/*/		//const float tilingFactor = 1.0f;
+		s_Data.TextureShader->UploadUniformFloat4("u_Color", tintColor);
 		if (s_Data.QuadIndexCount >= s_Data.MaxIndices) Flush();
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
@@ -266,26 +269,13 @@ namespace ALStore {
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;
 		}
-		/*std::string name = texture->GetName();
-		texIndex = (float)textLib.MapPos(name);
-		texture->Bind(texIndex);*/
-		/*for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-		{
-			if (*s_Data.TextureSlots[i].get() == *texture.get()){texIndex = (float)i; break;}
-			if (texIndex == 0.0f){
-				texIndex = (float)s_Data.TextureSlotIndex;
-				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-				s_Data.TextureSlotIndex++;
-			}
-		}*/
-
-
-		for (size_t i = 0; i < quadVertexCount; i++)
-		{
+		for (size_t i = 0; i < quadVertexCount; i++) {
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_Data.QuadVertexBufferPtr->TexCoord = flipped ? textureCoordsF[i] : textureCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->TilingFactor = 1.0f;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 		s_Data.QuadIndexCount += 6;

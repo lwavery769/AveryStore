@@ -11,7 +11,7 @@
 namespace ALStore {
 
 	Window::Window() {}
-	Window::~Window() { glfwDestroyWindow(m_Window); }
+	Window::~Window() { }
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		AL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
@@ -180,5 +180,6 @@ namespace ALStore {
 		glfwSwapBuffers(m_Window);
 		showFPS(m_Window);
 	}
-	void Window::OnShutdown() { glfwDestroyWindow(m_Window); glfwTerminate(); }
+	void Window::OnShutdown() { glfwDestroyWindow(m_Window); 
+		glfwTerminate(); }
 }

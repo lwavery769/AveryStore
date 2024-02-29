@@ -2,19 +2,17 @@
 #include "core/Log.h"
 
 namespace ALStore {
-    StoreInventory::StoreInventory() {
-
-
-    }
+    StoreInventory::StoreInventory() : m_Sell(true)
+    {}
     StoreInventory::~StoreInventory() {}
     void StoreInventory::CreateInventory() {
-          string name; double price; string category; int invQuantity;
+          string name; double price = 0.0; string category; int invQuantity = 0;
           
           
-          struct Inventory A[] = { {"Sugar", 1.00, "Staples", 10 },
-                               { "Tea", 2.00, "Spices", 7},
-                               { "Spice", 2.00, "Staples", 5},
-                                { "Milk", 3.5, "Dairy", 3}};
+          struct Inventory A[] = { {1, "Sugar", 1.00, "Staples", 10 },
+                               { 2, "Tea", 2.00, "Spices", 7},
+                               { 3, "Spice", 2.00, "Staples", 5},
+                                { 4, "Milk", 3.5, "Dairy", 3}};
           vector<Inventory> v;
           // Insertion of elements using push_back()
           for (int i = 0; i < sizeof(A) / sizeof(A[0]); i++) {
@@ -48,7 +46,7 @@ namespace ALStore {
                 int quantity = stoi(quantityStr);
 
                 Product p(id, name, category, price, quantity);
-                products.push_back(p);
+                venProducts.push_back(p);
             }
             file.close();
             print();
@@ -65,8 +63,17 @@ namespace ALStore {
             }
         }
     }
+    void StoreInventory::UpdateSales(int id) {
+        bool found = false;
+        for (auto i = storeInv.begin(); i != storeInv.end(); i++) {
+            if (i->id == id) {
+                i->invQuantity = i->invQuantity - 1; AL_INFO("1 sold");
+                m_Sold = m_Sold + i->price;
+            }
+        }
+    }
     void StoreInventory::print() {
-        for (auto i = products.begin(); i != products.end(); i++)
+        for (auto i = storeProducts.begin(); i != storeProducts.end(); i++)
         {
             AL_INFO("ID : {0}", i->getId());
             AL_INFO("Name : {0}", i->getName());
@@ -76,22 +83,17 @@ namespace ALStore {
         }
     }
     Product* StoreInventory::FindProduct(int id) {
-        for (auto i = products.begin(); i != products.end(); i++)
-        {
-            if (i->getId() == id)
-            {
-                return &(*i);
-            }
+        for (auto i = venProducts.begin(); i != venProducts.end(); i++){
+            if (i->getId() == id){return &(*i);}
         }
         return nullptr;
 
     }
     void StoreInventory::updateProduct(int id, string name, string category, double price, int quantity) {
         bool found = false;
-        for (auto i = products.begin(); i != products.end(); i++)
+        for (auto i = storeProducts.begin(); i != storeProducts.end(); i++)
         {
-            if (i->getId() == id)
-            {
+            if (i->getId() == id){
                 i->setName(name);
                 i->setCategory(category);
                 i->setPrice(price);

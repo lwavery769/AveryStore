@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Delivery.cpp" />
     <ClCompile Include="src\scene\Entity.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mypch.h</PrecompiledHeaderFile>
@@ -195,6 +196,7 @@
     <ClCompile Include="src\StoreInventory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Delivery.h" />
     <ClInclude Include="src\events\ApplicationEvent.h" />
     <ClInclude Include="src\events\Event.h" />
     <ClInclude Include="src\events\KeyEvent.h" />
@@ -224,7 +226,7 @@
     <ClInclude Include="src\StoreInventory.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\Inventory.csv" />
+    <None Include="assets\vendorInventory.csv" />
     <None Include="assets\fbShader.glsl" />
   </ItemGroup>
   <ItemGroup>

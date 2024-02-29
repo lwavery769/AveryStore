@@ -75,6 +75,9 @@
     <ClCompile Include="src\StoreInventory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Delivery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -158,10 +161,13 @@
     <ClInclude Include="src\StoreInventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Delivery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\fbShader.glsl" />
-    <None Include="assets\Inventory.csv" />
+    <None Include="assets\vendorInventory.csv" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="assets\Entities.xml" />

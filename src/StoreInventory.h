@@ -39,7 +39,7 @@ namespace ALStore {
         void setQuantity(int quantity) { this->quantity = quantity; }
     };
     struct Inventory{
-        string name; double price; string category; int invQuantity;
+        int id; string name; double price; string category; int invQuantity;
     }; //Inventory m_Stock;
     class StoreInventory
     {
@@ -50,13 +50,20 @@ namespace ALStore {
         void UpdateInventory(string name, double price, string category, int invQuantity);
         void loadInventoryFromFile(std::string filename);
         void print();
+        bool getSale() { return m_Sell; }
+        void setSale(bool s) { m_Sell = s; }
+        int getSold() { return m_Sold; }
         Product* FindProduct(int id);
-        vector<Inventory> GetInventory() { return storeInv; }
+        void UpdateSales(int id);
+        vector<Inventory> GetInventory() const { return storeInv; }
+        vector<Inventory>& GetInventory() { return storeInv; }
         void updateProduct(int id, string name, string category, double price, int quantity);
-        vector<Product> products;
-        int productSize() { return products.size(); }
+        vector<Product> venProducts, storeProducts;
+        int productSize() { return venProducts.size(); }
+  //      friend class Engine;
     private:
-        
+        bool m_Sell = false;
+        int m_Sold = 0;
         vector<Inventory> storeInv;
     };
 }

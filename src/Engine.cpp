@@ -33,7 +33,8 @@ static void glfw_error_callback(int error, const char* description)
 bool Engine::init() {
     m_Window = std::make_unique<ALStore::Window>();
     m_TextureLibrary = std::make_unique<ALStore::TextureLibrary>();
-    m_Renderer = std::make_unique<ALStore::Render2D>(); 
+    m_Renderer = std::make_shared<ALStore::Render2D>(); 
+ //   trkDelivery = std::make_shared<Delivery>();
     m_ImGui = std::make_unique<ALStore::ImGuiLayer>();
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
     AL_INFO("Window init");
@@ -48,18 +49,17 @@ bool Engine::init() {
     m_Framebuffer.reset(new ALStore::OpenGLFramebuffer(fbSpec));
     uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
     m_TextureLibrary->init();
+    trkDelivery.reset(new Delivery);
+    trkDelivery->init();
+ 
     //m_TextureLibrary->Load("assets/textures/dolorSign.png");   m_$texture = m_TextureLibrary->Get("dolorSign.png");
-    //m_Inventory_ptr = &storeInv;
-    //m_Inventory_ptr->loadInventoryFromFile("assets/Inventory.csv");
-    //storeInv.loadInventoryFromFile("assets/Inventory.csv");
-    //Product* item = m_Inventory_ptr->FindProduct(1);
     m_ActiveScene.reset(new Scene());
- ////   m_ActiveScene->LoadXML("assets/Entities.xml"); AL_INFO("Scene XML loaded");
+    m_Inventory.reset(new StoreInventory);
     e_Store = m_ActiveScene->CreateEntity("store1");
     e_Store.AddComponent<IDComponent>(127);  
     m_StoreTxt = std::make_shared<Texture2D>("assets/Textures/Store.png");
     e_Store.AddComponent<SpriteRendererComponent>(m_StoreTxt);
-    glm::vec2 store_size = { .402f, .750f }; glm::vec3 store_position = { -2.9f, 0.5f, 0.0f };
+   
     e_Store.GetComponent<TransformComponent>().Transform = Maths::getTransform(store_size, store_position);
     
     e_$ign = m_ActiveScene->CreateEntity("e_$ign");
@@ -68,13 +68,13 @@ bool Engine::init() {
     e_$ign.GetComponent<SpriteRendererComponent>().Color = m_colorG;
     glm::vec2 e_$ign_size = { .187f, .474f }; glm::vec3 e_$ign_position = { -2.89f, 0.918, 0.0f };
     e_$ign.GetComponent<TransformComponent>().Transform = Maths::getTransform(e_$ign_size, e_$ign_position);
-
+/*
     e_Truck2 = m_ActiveScene->CreateEntity("truck2");
     e_Truck2.AddComponent<IDComponent>(1);
     m_Truck2Txt = std::make_shared<Texture2D>("assets/Textures/Truck2.png");
     e_Truck2.AddComponent<SpriteRendererComponent>(m_Truck2Txt);
     e_Truck2.GetComponent<TransformComponent>().Transform = Maths::getTransform(truck2_size, truck2_position);
-
+  */
     m_Renderer->Init();
     if (!m_ImGui->init()) AL_CORE_ERROR("ImGui failure!");
  
@@ -95,94 +95,45 @@ void Engine::OnEvent(Event& e)
     //AL_CORE_TRACE("{0}", e);
 }
 void Engine::update() {
-    if (m_Flipped) {
-        truck2_position.x = truck2_position.x + .0075f;
-        e_Truck2.GetComponent<TransformComponent>().Transform = Maths::getTransform(truck2_size, truck2_position);
-        if (truck2_position.x < -0.9974995f)
-        {
-            //AL_CORE_INFO("POS {0}", truck2_position.x);
-            Set$out(false);
-        }
-        if (truck2_position.x > 1.237f) { 
-            m_Flipped = false;
-        }
-    }
-    else {
-        truck2_position.x = truck2_position.x - .0075f;
-        e_Truck2.GetComponent<TransformComponent>().Transform = Maths::getTransform(truck2_size, truck2_position);
-        if (truck2_position.x < -2.873f) {
-            m_Flipped = true; Set$out(true);
+   trkDelivery->updatePosition(); 
 
-        }
-    }
 }
 void Engine::render() {
     m_Renderer->BeginScene(m_Camera);
-
+    
  //https://stackoverflow.com/questions/20390028/c-using-glfwgettime-for-a-fixed-time-step
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_ActiveScene->drawMap();//e_Truck2.GetComponent<SpriteRendererComponent>().Texture->Bind();
-        m_Renderer->DrawSprite(e_Truck2.GetComponent<TransformComponent>().Transform, e_Truck2.GetComponent<SpriteRendererComponent>(), e_Truck2.GetComponent<IDComponent>().eID, m_Flipped);
         m_Renderer->DrawSprite(e_Store.GetComponent<TransformComponent>().Transform, e_Store.GetComponent<SpriteRendererComponent>(), e_Store.GetComponent<IDComponent>().eID);
-       
-          if ($out == true) { m_Renderer->DrawSprite(e_$ign.GetComponent<TransformComponent>().Transform, e_$ign.GetComponent<SpriteRendererComponent>());
-        }
+        if (trkDelivery->GetTrk()) trkDelivery->Render();
+        //if ($out == true) { m_Renderer->DrawSprite(e_$ign.GetComponent<TransformComponent>().Transform, e_$ign.GetComponent<SpriteRendererComponent>());}
         m_Renderer->EndScene();
         if (m_StorePanel) storeClicked();
-        //
-    
 }
 void Engine::storeClicked() {
-    //m_ImGui->SetStoreClose(true);
-    
     m_ImGui->begin();
-    m_ImGui->render();
-    /*
-    static bool showWindow = true;
-
-    if (showWindow)
-    {
-        if (!ImGui::Begin("Test WIndow", &showWindow))
-        {
-            ImGui::End();
-        }
-        else
-        {
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / ImGui::GetIO().Framerate,
-                ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
-    }*/
+    m_ImGui->renderTabs();
     m_ImGui->end();
 }
 void Engine::run() { 
     m_Camera.SetProjection(-5, 5, -5, 5); 
-    while (m_Window->isRunning())
-    {
-     //   Inv_ptr->print();
+    while (m_Window->isRunning()){
         if (m_LeftMouseBtn.isPressed) {
             $out = false;
             m_Framebuffer->Bind();
             int p = 0; int pixelData = 0;
             glClearColor(0.8f, 0.3f, 0.1f, 1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            m_Renderer->Flush(); render();
-            //e_Store.GetComponent<SpriteRendererComponent>().Texture->Bind();
-            //m_Renderer->DrawSprite(e_Store.GetComponent<TransformComponent>().Transform, e_Store.GetComponent<SpriteRendererComponent>(), e_Store.GetComponent<IDComponent>().eID);
+            m_Renderer->Flush(); 
+            render();
             m_Framebuffer->ClearAttachment(1, -1);
-            
-            //AL_INFO("ID {0}", e_Store.GetComponent<IDComponent>().eID);
             p = m_Framebuffer->ReadPixel(1, m_LeftMouseBtn.x, fbSpec.Height - m_LeftMouseBtn.y);
-            //printf("Pos %i, %i : %i\n", m_LeftMouseBtn.x, m_LeftMouseBtn.y, p);
             m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
-            //AL_INFO("pData = {0}", m_HoveredEntity.GetComponent<IDComponent>().eID);
-            //glm::vec3 out = decode_id(p); std::cout << out << std::endl;
             if (p == 1123942400) {
                 m_StorePanel = true;
                 AL_TRACE("Store clicked"); 
-                }
+            }
             m_Framebuffer->Unbind();
             m_LeftMouseBtn.isPressed = false;
         }
@@ -192,15 +143,24 @@ void Engine::run() {
         lastTime = nowTime;
 
         while (deltaTime >= 1.0) { 
-        //    update(); 
-        updates++; deltaTime--; 
+            update(); 
+            updates++; deltaTime--; 
         }
         render(); 
     //    ImGuiEdit(e_$ign);
         frames++;
-        if (glfwGetTime() - timer > 1.0) { timer++; 
-           // std::cout << "FPS: " << frames << " Updates:" << updates << std::endl;
-            updates = 0, frames = 0;}
+        if (glfwGetTime() - timer > 1.0) {
+            timer++;
+            m_ImGui->updateSales(timer);
+            //std::cout << "FPS: " << frames << " Updates:" << updates << std::endl;
+            std::cout << timer << std::endl;
+            int mod = (int)timer % 4;
+            if (mod == 0) {
+                std::cout << "4 sec" << std::endl; 
+                
+            }
+            updates = 0, frames = 0;
+        }
 
         m_Window->OnUpdate();
     }
@@ -297,10 +257,8 @@ bool Engine::OnWindowResizeEvent(WindowResizeEvent& e) {
     return false;
 
 }
-bool Engine::OnWindowClose(WindowCloseEvent& e)
-{
+bool Engine::OnWindowClose(WindowCloseEvent& e){
     AL_TRACE("Goodbye");
-
     m_Window->setRunning(false);
     return true;
 }
