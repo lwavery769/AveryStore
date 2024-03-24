@@ -6,13 +6,12 @@
 Engine* Engine::s_Instance = nullptr;
 Engine::Engine() : m_Camera(1.0f, 1.0f, 1.0f, 1.0f) { s_Instance = this; }
 Engine::~Engine() {}
-static void glfw_error_callback(int error, const char* description)
-{
+static void glfw_error_callback(int error, const char* description){
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
-
 bool Engine::init() {
     m_Window = std::make_unique<ALStore::Window>();
+    m_Store = std::make_unique<StoreClass>();
     m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
     AL_INFO("Window init");
     m_Window->init();
@@ -20,6 +19,7 @@ bool Engine::init() {
        // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -35,7 +35,8 @@ bool Engine::init() {
     ImGui_ImplGlfw_InitForOpenGL(s_Window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
- 
+    m_Store->loadInventoryFromFile("assets/Products.csv");
+    m_Store->print();
 	return true;
 }
 void Engine::OnEvent(Event& e)
@@ -104,12 +105,26 @@ void Engine::run() {
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        ImGui::Begin("Inventory");
+        m_Store->drawLayer();
+        ImGui::End();
+        static ImS8  data[10] = {1,2,3,4,5,6,7,8,9,10};
+        if (ImPlot::BeginPlot("Bar Plot")) {
+            ImPlot::PlotBars("Vertical", data, 10, 0.7, 1);
+            ImPlot::PlotBars("Horizontal", data, 10, 0.4, 1, ImPlotBarsFlags_Horizontal);
+            ImPlot::EndPlot();
+        }
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
         m_Window->OnUpdate();
     }
+    
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
+    ImGui::DestroyContext();
+    m_Window->OnShutdown();
+
 }
 bool Engine::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e) {
     //HZ_PROFILE_FUNCTION("MousePicking");

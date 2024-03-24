@@ -6,15 +6,17 @@
 #include "glm/glm/glm.hpp"
 #include "glm/glm/ext.hpp"
 #include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
+#include "implot/implot.h"
+#include "implot/implot_internal.h"
 #include "window/Window.h"
 #include "events/Event.h"
 #include "events/ApplicationEvent.h"
 #include "events/MouseEvent.h"
 #include "events/KeyEvent.h"
 #include "render/OrthographicCamera.h"
+#include "storeLayer/StoreClass.h"
 
 using namespace ALStore;
 class Engine
@@ -30,6 +32,8 @@ public:
 private:
 	//GLFWwindow* m_Window;
 	std::unique_ptr<ALStore::Window> m_Window;
+	std::unique_ptr<StoreClass> m_Store;
+
 	bool show_demo_window = true;
 	bool show_another_window = false; 
 	GLFWwindow* s_Window; int ww, wh;

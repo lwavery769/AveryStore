@@ -1,0 +1,13 @@
+[submodule "include/spdlog"]
+	path = include/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "include/glm"]
+	path = include/glm
+	url = https://github.com/g-truc/glm
+[submodule "include/ImGui"]
+	path = include/ImGui
+	url = https://github.com/ocornut/imgui
+	branch = docking
+[submodule "include/ImPlot"]
+	path = include/ImPlot
+	url = https://github.com/epezent/implot

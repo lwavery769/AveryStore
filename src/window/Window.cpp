@@ -11,7 +11,7 @@
 namespace ALStore {
 
 	Window::Window() {}
-	Window::~Window() { glfwDestroyWindow(m_Window); }
+	Window::~Window() {  }
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		AL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
@@ -21,17 +21,17 @@ namespace ALStore {
 		AL_CORE_INFO("Window init");
 		if (!glfwInit()) AL_CORE_CRITICAL("GLFW FAILED");
 		glfwSetErrorCallback(GLFWErrorCallback);
-		m_Window = glfwCreateWindow(800, 600, "ALAvery", NULL, NULL);
+		m_Window = glfwCreateWindow(1200, 900, "ALAvery", NULL, NULL);
 		if (!m_Window) { AL_CORE_CRITICAL("GLFW WINDOW CREATION FAILED"); return false; }
 		m_Data.Title = "ALAvery"; // props.Title;
-		m_Data.Width = 800; // props.Width;
-		m_Data.Height = 600; // props.Height;
+		m_Data.Width = 1200; // props.Width;
+		m_Data.Height = 900; // props.Height;
 
 		//AL_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 		glfwMakeContextCurrent(m_Window);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -178,5 +178,5 @@ namespace ALStore {
 		glfwSwapBuffers(m_Window);
 		showFPS(m_Window);
 	}
-	void Window::OnShutdown() { glfwTerminate(); }
+	void Window::OnShutdown() { glfwDestroyWindow(m_Window); glfwTerminate(); }
 }
